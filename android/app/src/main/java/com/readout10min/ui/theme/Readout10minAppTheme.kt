@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-
+import androidx.compose.runtime.CompositionLocalProvider
 private val DarkColorScheme = darkColorScheme(
     primary = Primary,
     secondary = Secondary,
@@ -66,10 +66,19 @@ fun Readout10minAppTheme(
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
+// 使用 CompositionLocalProvider 提供自定义样式
+    CompositionLocalProvider(LocalCustomTypography provides CustomTypography()) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
+}
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+// 3. 创建一个伴生对象，方便访问自定义样式
+object AppTheme {
+    val customTypography: CustomTypography
+        @Composable
+        get() = LocalCustomTypography.current
 }

@@ -1,2 +1,13 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        // 添加自定义仓库地址
+        maven { url 'https://maven.aliyun.com' }
+    }
+}
+
 rootProject.name = "Readout-10min-App"
 include ':app'
+
