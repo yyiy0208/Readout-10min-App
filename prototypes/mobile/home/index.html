@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readout-10min - 首页</title>
+    <style>
+        /* 移动端 新配色方案 - 用户提供的配色 */
+        :root {
+            --mobile-screen-width: 375px;
+            --mobile-screen-height: 667px;
+            
+            /* 主色调 - 基于用户提供的配色方案 */
+            --primary-color: #ff8ba7; /* 强调色 - 主色调 */
+            --primary-light: #ffc6c7; /* 次要色 - 主色调变体 */
+            --secondary-color: #c3f0ca; /* 第三色 - 辅助色 */
+            --accent-color: #ff8ba7; /* 强调色 */
+            --accent-2: #ffc6c7; /* 次要色 */
+            --accent-3: #c3f0ca; /* 第三色 */
+            
+            /* 功能色 */
+            --success-color: #22c55e; /* 成功色 */
+            --error-color: #ef4444; /* 错误色 */
+            --warning-color: #f59e0b; /* 警告色 */
+            --info-color: #3b82f6; /* 信息色 */
+            
+            /* 背景色 - 基于用户提供的配色方案 */
+            --background-color: #fffffe; /* 主背景色 */
+            --background-alt: #faeee7; /* 卡片背景色 */
+            --background-light: #ffc6c7; /* 辅助背景色 */
+            
+            /* 文字色 - 基于用户提供的配色方案 */
+            --text-primary: #33272a; /* 主文字色 - 标题、卡片标题 */
+            --text-secondary: #594a4e; /* 次要文字色 - 副标题、卡片段落 */
+            --text-light: #594a4e; /* 辅助文字色 */
+            --text-muted: #cbd5e1; /* 禁用文字色 */
+            
+            /* 边框色 */
+            --border-color: #ffc6c7; /* 边框色 */
+            --border-light: #ffc6c7; /* 浅边框色 */
+            --border-dark: #594a4e; /* 深边框色 */
+            
+            /* 阴影效果 - 柔和自然 */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* 字体 - 现代清晰 */
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            
+            /* 行高和字重 */
+            --line-height-tight: 1.25;
+            --line-height-normal: 1.5;
+            --line-height-relaxed: 1.75;
+            --font-weight-light: 300;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* 间距 - 充足的留白 */
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-5: 1.25rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --spacing-10: 2.5rem;
+            --spacing-12: 3rem;
+            
+            /* 圆角 - 柔和的弧度 */
+            --border-radius-sm: 0.25rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-full: 9999px;
+            
+            /* 过渡效果 */
+            --transition-fast: 150ms ease-in-out;
+            --transition-base: 250ms ease-in-out;
+            --transition-slow: 350ms ease-in-out;
+        }
+
+        /* 移动端应用容器 */
+        .mobile-app {
+            width: var(--mobile-screen-width);
+            height: var(--mobile-screen-height);
+            margin: 0 auto;
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-family);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 顶部标题栏 - Happy Hues 风格 */
+        .mobile-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--spacing-4);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .mobile-header h1 {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            margin: 0;
+        }
+
+        /* 主内容区域 */
+        .mobile-main {
+            flex: 1;
+            padding: var(--spacing-4);
+            overflow-y: auto;
+        }
+
+        /* 统计卡片样式 - Happy Hues 风格 */
+        .stats-card {
+            background-color: var(--background-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-4);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+        }
+
+        .stats-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .stats-header h2 {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .stats-icon {
+            font-size: var(--font-size-lg);
+        }
+
+        .stats-content {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            margin-top: var(--spacing-1);
+        }
+
+        .stat-divider {
+            width: 1px;
+            height: 40px;
+            background-color: var(--border-color);
+        }
+
+        /* 推荐区域样式 */
+        .recommendation-section {
+            margin-bottom: var(--spacing-6);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .section-header h2 {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .see-all {
+            font-size: var(--font-size-xs);
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+        }
+
+        /* 推荐卡片样式 - Happy Hues 风格 */
+        .recommendation-card {
+            background-color: var(--background-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-4);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+        }
+
+        .recommendation-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .recommendation-card h3 {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            margin: 0 0 var(--spacing-2) 0;
+            color: var(--text-primary);
+        }
+
+        .article-meta {
+            display: flex;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-2);
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .article-preview {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-4);
+            line-height: var(--line-height-normal);
+        }
+
+        /* Happy Hues 风格按钮基础样式 */
+        .btn {
+            padding: var(--spacing-4) var(--spacing-6);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-family);
+        }
+
+        /* 主按钮 */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 次要按钮 */
+        .btn-secondary {
+            background-color: var(--background-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: var(--spacing-3) var(--spacing-5);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 全宽按钮 */
+        .btn-full {
+            width: 100%;
+        }
+
+        /* 最近阅读样式 - Happy Hues 风格 */
+        .recent-section {
+            margin-bottom: 80px; /* 为底部导航栏留出空间 */
+        }
+
+        .recent-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-3);
+        }
+
+        .recent-item {
+            background-color: var(--background-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-4);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--transition-base);
+        }
+
+        .recent-item:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateX(4px);
+        }
+
+        .recent-content h4 {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            margin: 0 0 var(--spacing-1) 0;
+            color: var(--text-primary);
+        }
+
+        .recent-meta {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-1);
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .recent-progress {
+            color: var(--success-color);
+        }
+
+        /* 底部导航栏 - Happy Hues 风格 */
+        .mobile-footer {
+            position: fixed;
+            bottom: 0;
+            width: var(--mobile-screen-width);
+            background-color: var(--background-alt);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: var(--spacing-2) 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-1);
+            padding: var(--spacing-2) var(--spacing-3);
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all var(--transition-base);
+            border-radius: var(--border-radius-md);
+        }
+
+        .nav-item:hover {
+            background-color: var(--background-light);
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+            background-color: rgba(84, 50, 211, 0.1);
+        }
+
+        .nav-icon {
+            font-size: var(--font-size-lg);
+        }
+
+        .nav-label {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-app">
+        <!-- 顶部标题栏 -->
+        <header class="mobile-header">
+            <h1>Readout-10min</h1>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="mobile-main">
+            <!-- 练习统计卡片 -->
+            <section class="stats-card">
+                <div class="stats-header">
+                    <h2>练习统计</h2>
+                    <span class="stats-icon">📊</span>
+                </div>
+                <div class="stats-content">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-days">15</div>
+                        <div class="stat-label">累计练习天数</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="today-status">0/1</div>
+                        <div class="stat-label">今日练习</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 今日推荐 -->
+            <section class="recommendation-section">
+                <div class="section-header">
+                    <h2>今日推荐</h2>
+                    <a href="#" class="see-all">查看全部</a>
+                </div>
+                
+                <div class="recommendation-card">
+                    <h3>Sample Article Title</h3>
+                    <div class="article-meta">
+                        <span class="duration">⏱️ 12 分钟</span>
+                        <span class="difficulty">📚 中等</span>
+                    </div>
+                    <p class="article-preview">This article is recommended for you based on your reading history and preferences...</p>
+                    <button class="btn btn-primary btn-full">开始练习</button>
+                </div>
+            </section>
+
+            <!-- 最近阅读 -->
+            <section class="recent-section">
+                <div class="section-header">
+                    <h2>最近阅读</h2>
+                    <a href="#" class="see-all">查看全部</a>
+                </div>
+                
+                <div class="recent-list">
+                    <!-- 最近阅读项1 -->
+                    <div class="recent-item">
+                        <div class="recent-content">
+                            <h4>Article 1</h4>
+                            <div class="recent-meta">
+                                <span class="recent-duration">8 分钟</span>
+                                <span class="recent-progress">70%</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary">继续</button>
+                    </div>
+                    
+                    <!-- 最近阅读项2 -->
+                    <div class="recent-item">
+                        <div class="recent-content">
+                            <h4>Article 2</h4>
+                            <div class="recent-meta">
+                                <span class="recent-duration">10 分钟</span>
+                                <span class="recent-progress">30%</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary">继续</button>
+                    </div>
+                    
+                    <!-- 最近阅读项3 -->
+                    <div class="recent-item">
+                        <div class="recent-content">
+                            <h4>Article 3</h4>
+                            <div class="recent-meta">
+                                <span class="recent-duration">15 分钟</span>
+                                <span class="recent-progress">100%</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary">重新练习</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部导航栏 -->
+        <footer class="mobile-footer">
+            <a href="#" class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">首页</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">📚</span>
+                <span class="nav-label">内容库</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">📝</span>
+                <span class="nav-label">练习</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">记录</span>
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        // 移动端交互
+        const mobileApp = document.querySelector('.mobile-app');
+
+        // 开始练习按钮点击
+        mobileApp.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const button = e.target;
+                
+                if (button.textContent === '开始练习') {
+                    alert('开始朗读练习');
+                    // 跳转到朗读练习页
+                    // window.location.href = '/reading-practice';
+                } else if (button.textContent === '继续') {
+                    alert('继续上次练习');
+                    // 跳转到朗读练习页并恢复进度
+                } else if (button.textContent === '重新练习') {
+                    alert('重新开始练习');
+                    // 跳转到朗读练习页从头开始
+                }
+            }
+        });
+
+        // 底部导航栏交互
+        const navItems = mobileApp.querySelectorAll('.nav-item');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                // 移除所有active类
+                navItems.forEach(nav => nav.classList.remove('active'));
+                // 添加active类到当前项
+                item.classList.add('active');
+                // 根据导航项跳转到不同页面
+                const navLabel = item.querySelector('.nav-label').textContent;
+                alert(`跳转到${navLabel}页面`);
+            });
+        });
+    </script>
+</body>
+</html>

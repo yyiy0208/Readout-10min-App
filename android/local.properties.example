@@ -1,0 +1,9 @@
+# Supabase Configuration
+SUPABASE_URL=https://rpdosngigisripruwhps.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_WTinBSIpHIqCk5b84sZa9A_grpca6r
+
+# Android Configuration
+android.useAndroidX=true
+android.enableJetifier=true
+org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+android.nonTransitiveRClass=true

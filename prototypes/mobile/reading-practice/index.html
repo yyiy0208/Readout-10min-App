@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readout-10min - 朗读练习</title>
+    <style>
+        /* 移动端 新配色方案 - 用户提供的配色 */
+        :root {
+            --mobile-screen-width: 375px;
+            --mobile-screen-height: 667px;
+            
+            /* 主色调 - 基于用户提供的配色方案 */
+            --primary-color: #ff8ba7; /* 强调色 - 主色调 */
+            --primary-light: #ffc6c7; /* 次要色 - 主色调变体 */
+            --secondary-color: #c3f0ca; /* 第三色 - 辅助色 */
+            --accent-color: #ff8ba7; /* 强调色 */
+            --accent-2: #ffc6c7; /* 次要色 */
+            --accent-3: #c3f0ca; /* 第三色 */
+            
+            /* 功能色 */
+            --success-color: #22c55e; /* 成功色 */
+            --error-color: #ef4444; /* 错误色 */
+            --warning-color: #f59e0b; /* 警告色 */
+            --info-color: #3b82f6; /* 信息色 */
+            
+            /* 背景色 - 基于用户提供的配色方案 */
+            --background-color: #fffffe; /* 主背景色 */
+            --background-alt: #faeee7; /* 卡片背景色 */
+            --background-light: #ffc6c7; /* 辅助背景色 */
+            
+            /* 文字色 - 基于用户提供的配色方案 */
+            --text-primary: #33272a; /* 主文字色 - 标题、卡片标题 */
+            --text-secondary: #594a4e; /* 次要文字色 - 副标题、卡片段落 */
+            --text-light: #594a4e; /* 辅助文字色 */
+            --text-muted: #cbd5e1; /* 禁用文字色 */
+            
+            /* 边框色 */
+            --border-color: #ffc6c7; /* 边框色 */
+            --border-light: #ffc6c7; /* 浅边框色 */
+            --border-dark: #594a4e; /* 深边框色 */
+            
+            /* 阴影效果 - 柔和自然 */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* 字体 - 现代清晰 */
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            
+            /* 行高和字重 */
+            --line-height-tight: 1.25;
+            --line-height-normal: 1.5;
+            --line-height-relaxed: 1.75;
+            --font-weight-light: 300;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* 间距 - 充足的留白 */
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-5: 1.25rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --spacing-10: 2.5rem;
+            --spacing-12: 3rem;
+            
+            /* 圆角 - 柔和的弧度 */
+            --border-radius-sm: 0.25rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-full: 9999px;
+            
+            /* 过渡效果 */
+            --transition-fast: 150ms ease-in-out;
+            --transition-base: 250ms ease-in-out;
+            --transition-slow: 350ms ease-in-out;
+        }
+
+        /* 朗读练习页样式 - Happy Hues 风格 */
+        .reading-practice-app {
+            width: var(--mobile-screen-width);
+            height: var(--mobile-screen-height);
+            margin: 0 auto;
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-family);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 顶部状态栏 - Happy Hues 风格 */
+        .practice-status-bar {
+            background-color: var(--background-alt);
+            padding: var(--spacing-3) var(--spacing-4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+        }
+
+        /* 阅读区域 */
+        .reading-area {
+            flex: 1;
+            padding: var(--spacing-6) var(--spacing-4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--background-color);
+        }
+
+        .paragraph-container {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .paragraph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-6);
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        /* 阅读文本 */
+        .reading-text {
+            font-size: var(--font-size-lg);
+            line-height: var(--line-height-normal);
+            margin-bottom: var(--spacing-8);
+            text-align: left;
+            color: var(--text-primary);
+        }
+
+        /* 进度指示器 */
+        .progress-indicator {
+            margin-top: var(--spacing-8);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background-color: var(--background-light);
+            border-radius: var(--border-radius-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius-full);
+        }
+
+        /* 底部控制栏 - Happy Hues 风格 */
+        .control-bar {
+            background-color: var(--background-alt);
+            padding: var(--spacing-4);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--spacing-2);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Happy Hues 风格控制按钮 */
+        .control-btn {
+            padding: var(--spacing-3) var(--spacing-4);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--background-light);
+            color: var(--text-primary);
+        }
+
+        .control-btn:hover {
+            background-color: var(--border-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 主按钮 */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 大号按钮 */
+        .btn-large {
+            flex: 1;
+            padding: var(--spacing-4) var(--spacing-6);
+            font-size: var(--font-size-base);
+        }
+
+        /* 设置面板 - Happy Hues 风格 */
+        .settings-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--background-alt);
+            border-top-left-radius: var(--border-radius-xl);
+            border-top-right-radius: var(--border-radius-xl);
+            padding: var(--spacing-4);
+            box-shadow: var(--shadow-lg);
+            max-height: 80%;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-6);
+            padding-bottom: var(--spacing-4);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-header h2 {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: var(--spacing-1);
+            transition: all var(--transition-base);
+        }
+
+        .close-btn:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        /* Happy Hues 风格按钮基础样式 */
+        .btn {
+            padding: var(--spacing-4) var(--spacing-6);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-family);
+        }
+
+        /* 主按钮 */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 次要按钮 */
+        .btn-secondary {
+            background-color: var(--background-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-6);
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-3);
+        }
+
+        .setting-item label {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+        }
+
+        /* 字体大小控制 */
+        .font-size-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-4);
+            justify-content: center;
+        }
+
+        #font-size-value {
+            font-weight: var(--font-weight-semibold);
+            min-width: 40px;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        /* 间距和速度选项 */
+        .spacing-options, .speed-options {
+            display: flex;
+            gap: var(--spacing-3);
+            justify-content: center;
+        }
+
+        .spacing-options .btn, .speed-options .btn {
+            flex: 1;
+            max-width: 100px;
+            padding: var(--spacing-3) var(--spacing-4);
+        }
+
+        /* 背景色选项 */
+        .background-options {
+            display: flex;
+            gap: var(--spacing-3);
+            justify-content: center;
+        }
+
+        .background-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .background-option:hover {
+            transform: scale(1.1);
+        }
+
+        .background-option.active {
+            border-color: var(--primary-color);
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="reading-practice-app">
+        <!-- 顶部状态栏 -->
+        <div class="practice-status-bar">
+            <div class="status-left">⏱️</div>
+            <div class="status-center">
+                <span id="current-duration">3:25</span> / <span id="total-duration">12:00</span>
+            </div>
+            <div class="status-right">📊</div>
+        </div>
+
+        <!-- 阅读区域 -->
+        <main class="reading-area">
+            <div class="paragraph-container">
+                <div class="paragraph-header">
+                    <span class="paragraph-number">段落 1/4</span>
+                    <span class="word-count">25 词</span>
+                </div>
+                <div class="reading-text">
+                    This is the first paragraph of the sample article. It contains some text that will be split into readable paragraphs for the user to practice reading.
+                </div>
+                <div class="progress-indicator">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部控制栏 -->
+        <footer class="control-bar">
+            <button class="control-btn" id="prev-btn">⏮️ 上一段</button>
+            <button class="control-btn btn-primary btn-large" id="play-pause-btn">⏸️ 暂停</button>
+            <button class="control-btn" id="next-btn">下一段 ⏭️</button>
+            <button class="control-btn" id="settings-btn">⚙️ 设置</button>
+        </footer>
+
+        <!-- 阅读设置面板 -->
+        <div class="settings-panel" id="settings-panel" style="display: none;">
+            <div class="settings-header">
+                <h2>阅读设置</h2>
+                <button class="close-btn" id="close-settings">✕</button>
+            </div>
+            <div class="settings-content">
+                <!-- 字体大小 -->
+                <div class="setting-item">
+                    <label>字体大小</label>
+                    <div class="font-size-controls">
+                        <button class="btn btn-secondary" id="decrease-font">A-</button>
+                        <span id="font-size-value">18</span>px
+                        <button class="btn btn-secondary" id="increase-font">A+</button>
+                    </div>
+                </div>
+
+                <!-- 行间距 -->
+                <div class="setting-item">
+                    <label>行间距</label>
+                    <div class="spacing-options">
+                        <button class="btn btn-secondary" data-spacing="small">小</button>
+                        <button class="btn btn-primary" data-spacing="medium">中</button>
+                        <button class="btn btn-secondary" data-spacing="large">大</button>
+                    </div>
+                </div>
+
+                <!-- 背景色 -->
+                <div class="setting-item">
+                    <label>背景色</label>
+                    <div class="background-options">
+                        <button class="background-option active" data-bg="white" style="background-color: white; border: 1px solid var(--border-color);"></button>
+                        <button class="background-option" data-bg="beige" style="background-color: #FFFBEB; border: 1px solid var(--border-color);"></button>
+                        <button class="background-option" data-bg="dark" style="background-color: #121212; border: 1px solid var(--border-color);"></button>
+                    </div>
+                </div>
+
+                <!-- 自动滚动速度 -->
+                <div class="setting-item">
+                    <label>自动滚动速度</label>
+                    <div class="speed-options">
+                        <button class="btn btn-secondary" data-speed="slow">慢</button>
+                        <button class="btn btn-primary" data-speed="medium">中</button>
+                        <button class="btn btn-secondary" data-speed="fast">快</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 朗读练习页交互
+        const readingPracticeApp = document.querySelector('.reading-practice-app');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const settingsBtn = document.getElementById('settings-btn');
+        const closeSettings = document.getElementById('close-settings');
+        const settingsPanel = document.getElementById('settings-panel');
+        const readingText = document.querySelector('.reading-text');
+        const fontSizeValue = document.getElementById('font-size-value');
+        const decreaseFont = document.getElementById('decrease-font');
+        const increaseFont = document.getElementById('increase-font');
+
+        // 播放/暂停按钮
+        let isPlaying = true;
+
+        playPauseBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                playPauseBtn.innerHTML = '⏸️ 暂停';
+                alert('继续朗读');
+                // 开始自动滚动
+            } else {
+                playPauseBtn.innerHTML = '▶️ 继续';
+                alert('暂停朗读');
+                // 停止自动滚动
+            }
+        });
+
+        // 上一段/下一段按钮
+        prevBtn.addEventListener('click', () => {
+            alert('切换到上一段');
+            // 切换到上一段落
+        });
+
+        nextBtn.addEventListener('click', () => {
+            alert('切换到下一段');
+            // 切换到下一段落
+        });
+
+        // 设置按钮
+        settingsBtn.addEventListener('click', () => {
+            settingsPanel.style.display = 'block';
+        });
+
+        closeSettings.addEventListener('click', () => {
+            settingsPanel.style.display = 'none';
+        });
+
+        // 字体大小调整
+        let fontSize = 18;
+
+        decreaseFont.addEventListener('click', () => {
+            if (fontSize > 14) {
+                fontSize--;
+                fontSizeValue.textContent = fontSize;
+                readingText.style.fontSize = `${fontSize}px`;
+            }
+        });
+
+        increaseFont.addEventListener('click', () => {
+            if (fontSize < 24) {
+                fontSize++;
+                fontSizeValue.textContent = fontSize;
+                readingText.style.fontSize = `${fontSize}px`;
+            }
+        });
+
+        // 行间距调整
+        const spacingBtns = settingsPanel.querySelectorAll('.spacing-options .btn');
+
+        spacingBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有active类
+                spacingBtns.forEach(b => b.classList.remove('btn-primary'));
+                spacingBtns.forEach(b => b.classList.add('btn-secondary'));
+                // 添加active类到当前按钮
+                btn.classList.remove('btn-secondary');
+                btn.classList.add('btn-primary');
+                
+                const spacing = btn.dataset.spacing;
+                let lineHeight;
+                switch(spacing) {
+                    case 'small': lineHeight = '1.4'; break;
+                    case 'medium': lineHeight = '1.6'; break;
+                    case 'large': lineHeight = '1.8'; break;
+                }
+                readingText.style.lineHeight = lineHeight;
+            });
+        });
+
+        // 自动滚动速度调整
+        const speedBtns = settingsPanel.querySelectorAll('.speed-options .btn');
+
+        speedBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有active类
+                speedBtns.forEach(b => b.classList.remove('btn-primary'));
+                speedBtns.forEach(b => b.classList.add('btn-secondary'));
+                // 添加active类到当前按钮
+                btn.classList.remove('btn-secondary');
+                btn.classList.add('btn-primary');
+                
+                const speed = btn.dataset.speed;
+                alert(`设置自动滚动速度为 ${speed}`);
+                // 调整自动滚动速度
+            });
+        });
+
+        // 背景色调整
+        const backgroundOptions = settingsPanel.querySelectorAll('.background-option');
+
+        backgroundOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // 移除所有active类
+                backgroundOptions.forEach(opt => opt.classList.remove('active'));
+                // 添加active类到当前选项
+                option.classList.add('active');
+                
+                const bgColor = option.dataset.bg;
+                let bgValue;
+                let textColor;
+                
+                switch(bgColor) {
+                    case 'white':
+                        bgValue = '#FFFFFF';
+                        textColor = '#000000';
+                        break;
+                    case 'beige':
+                        bgValue = '#FFFBEB';
+                        textColor = '#000000';
+                        break;
+                    case 'dark':
+                        bgValue = '#121212';
+                        textColor = '#FFFFFF';
+                        break;
+                }
+                
+                // 更新背景色和文本色
+                document.documentElement.style.setProperty('--background-color', bgValue);
+                document.documentElement.style.setProperty('--text-color', textColor);
+                readingPracticeApp.style.backgroundColor = bgValue;
+                readingText.style.color = textColor;
+            });
+        });
+
+        // 点击屏幕中央暂停/继续
+        readingPracticeApp.addEventListener('click', (e) => {
+            if (e.target.closest('.reading-area') && !e.target.closest('.control-bar') && !e.target.closest('.settings-panel')) {
+                // 点击阅读区域中央
+                playPauseBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

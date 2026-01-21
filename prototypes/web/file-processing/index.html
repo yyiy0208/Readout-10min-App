@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件处理 - Readout-10min</title>
+    <style>
+        /* 新配色方案 - 用户提供的配色 */
+        :root {
+            /* 主色调 - 基于用户提供的配色方案 */
+            --primary-color: #ff8ba7; /* 强调色 - 主色调 */
+            --primary-light: #ffc6c7; /* 次要色 - 主色调变体 */
+            --secondary-color: #c3f0ca; /* 第三色 - 辅助色 */
+            --accent-color: #ff8ba7; /* 强调色 */
+            --accent-2: #ffc6c7; /* 次要色 */
+            --accent-3: #c3f0ca; /* 第三色 */
+            
+            /* 功能色 */
+            --success-color: #22c55e; /* 成功色 */
+            --error-color: #ef4444; /* 错误色 */
+            --warning-color: #f59e0b; /* 警告色 */
+            --info-color: #3b82f6; /* 信息色 */
+            
+            /* 背景色 - 基于用户提供的配色方案 */
+            --background-color: #fffffe; /* 主背景色 */
+            --background-alt: #faeee7; /* 卡片背景色 */
+            --background-light: #ffc6c7; /* 辅助背景色 */
+            
+            /* 文字色 - 基于用户提供的配色方案 */
+            --text-primary: #33272a; /* 主文字色 - 标题、卡片标题 */
+            --text-secondary: #594a4e; /* 次要文字色 - 副标题、卡片段落 */
+            --text-light: #594a4e; /* 辅助文字色 */
+            --text-muted: #cbd5e1; /* 禁用文字色 */
+            
+            /* 边框色 */
+            --border-color: #ffc6c7; /* 边框色 */
+            --border-light: #ffc6c7; /* 浅边框色 */
+            --border-dark: #594a4e; /* 深边框色 */
+            
+            /* 阴影效果 - 柔和自然 */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* 字体 - 现代清晰 */
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            
+            /* 行高和字重 */
+            --line-height-tight: 1.25;
+            --line-height-normal: 1.5;
+            --line-height-relaxed: 1.75;
+            --font-weight-light: 300;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* 间距 - 充足的留白 */
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-5: 1.25rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --spacing-10: 2.5rem;
+            --spacing-12: 3rem;
+            --spacing-16: 4rem;
+            
+            /* 圆角 - 柔和的弧度 */
+            --border-radius-sm: 0.25rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-full: 9999px;
+            
+            /* 过渡效果 */
+            --transition-fast: 150ms ease-in-out;
+            --transition-base: 250ms ease-in-out;
+            --transition-slow: 350ms ease-in-out;
+        }
+
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Happy Hues 风格基础样式 */
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-normal);
+            font-weight: var(--font-weight-normal);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 应用容器 */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 顶部导航栏 - Happy Hues 风格 */
+        .top-nav {
+            background-color: var(--primary-color);
+            color: white;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-8);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        /* Logo设计 */
+        .logo {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            letter-spacing: -0.02em;
+        }
+
+        /* 导航链接 */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            padding: var(--spacing-3) var(--spacing-5);
+            border-radius: var(--border-radius-full);
+            transition: all var(--transition-base);
+            font-size: var(--font-size-sm);
+            opacity: 0.8;
+            position: relative;
+        }
+
+        /* 导航链接悬停效果 */
+        .nav-links a:hover {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 激活导航项 */
+        .nav-links a.active {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* 下拉菜单样式 */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle {
+            cursor: pointer;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+            min-width: 160px;
+            padding: var(--spacing-2) 0;
+            margin-top: var(--spacing-2);
+            z-index: 1000;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: var(--spacing-3) var(--spacing-6);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-base);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--background-light);
+        }
+
+        /* 主内容区域 - 上下布局 */
+        .file-processing-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-8);
+            padding: var(--spacing-8);
+            flex: 1;
+        }
+
+        /* 设置面板样式 - Happy Hues 风格 */
+        .settings-panel {
+            background-color: var(--background-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+            height: fit-content;
+            overflow: hidden;
+        }
+
+        .settings-panel:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .panel-header {
+            padding: var(--spacing-4);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+
+        .panel-content {
+            padding: var(--spacing-4);
+        }
+
+        /* 设置项样式 */
+        .setting-item {
+            margin-bottom: var(--spacing-6);
+        }
+
+        .setting-item label {
+            display: block;
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--spacing-2);
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+        }
+
+        /* 滑块样式 */
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--background-light);
+            outline: none;
+            border-radius: var(--border-radius-full);
+            margin: var(--spacing-3) 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-sm);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background-color: var(--primary-light);
+        }
+
+        .duration-display {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            margin: var(--spacing-2) 0;
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-xs);
+            color: var(--text-light);
+        }
+
+        /* 单选按钮组样式 */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2);
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            padding: var(--spacing-3) var(--spacing-4);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            font-size: var(--font-size-sm);
+        }
+
+        .radio-option:hover {
+            background-color: var(--background-light);
+            transform: translateX(4px);
+        }
+
+        .radio-option input[type="radio"] {
+            accent-color: var(--primary-color);
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Happy Hues 风格按钮基础样式 */
+        .btn {
+            padding: var(--spacing-4) var(--spacing-6);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-family);
+        }
+
+        /* 主按钮 */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 次要按钮 */
+        .btn-secondary {
+            background-color: var(--background-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 成功按钮 */
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 小号按钮 */
+        .btn-sm {
+            padding: var(--spacing-3) var(--spacing-4);
+            font-size: var(--font-size-xs);
+        }
+
+        /* 大号按钮 */
+        .btn-lg {
+            padding: var(--spacing-5) var(--spacing-8);
+            font-size: var(--font-size-base);
+        }
+
+        /* 全宽按钮 */
+        .btn-full {
+            width: 100%;
+        }
+
+        /* 按钮禁用状态 */
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 操作按钮样式 */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-3);
+            margin-top: var(--spacing-8);
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+        }
+
+        /* 内容面板样式 - Happy Hues 风格 */
+        .content-panel {
+            background-color: var(--background-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+            overflow: hidden;
+        }
+
+        .content-panel:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 预览区域样式 */
+        .preview-section {
+            padding: var(--spacing-8);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-6);
+            flex-wrap: wrap;
+            gap: var(--spacing-4);
+        }
+
+        .section-header h2 {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .file-info {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            display: flex;
+            gap: var(--spacing-4);
+        }
+
+        .file-name {
+            margin-right: var(--spacing-4);
+        }
+
+        /* 内容预览区域 */
+        .content-preview {
+            background-color: var(--background-light);
+            padding: var(--spacing-6);
+            border-radius: var(--border-radius-lg);
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: var(--line-height-relaxed);
+            border: 1px solid var(--border-color);
+        }
+
+        .content-preview h3 {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-4);
+            color: var(--text-primary);
+        }
+
+        .content-preview p {
+            margin-bottom: var(--spacing-4);
+            color: var(--text-secondary);
+        }
+
+        /* 结果区域样式 */
+        .result-section {
+            padding: var(--spacing-8);
+        }
+
+        .result-stats {
+            display: flex;
+            gap: var(--spacing-8);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        .result-stats strong {
+            color: var(--primary-color);
+        }
+
+        /* 段落列表样式 */
+        .paragraphs-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-4);
+            margin-top: var(--spacing-4);
+        }
+
+        .paragraph-item {
+            background-color: var(--background-light);
+            padding: var(--spacing-5);
+            border-radius: var(--border-radius-lg);
+            border-left: 4px solid var(--primary-color);
+            transition: all var(--transition-base);
+            border: 1px solid var(--border-color);
+        }
+
+        .paragraph-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-color);
+        }
+
+        .paragraph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .paragraph-number {
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+        }
+
+        .paragraph-meta {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .paragraph-text {
+            font-size: var(--font-size-sm);
+            line-height: var(--line-height-relaxed);
+            color: var(--text-secondary);
+        }
+
+        /* 页脚样式 - Happy Hues 风格 */
+        .footer {
+            background-color: var(--background-alt);
+            border-top: 1px solid var(--border-color);
+            padding: var(--spacing-8);
+            text-align: center;
+            color: var(--text-light);
+            font-size: var(--font-size-xs);
+            line-height: var(--line-height-relaxed);
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer p {
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* 页脚装饰 */
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 - 与file-management一致 -->
+        <header class="top-nav">
+            <div class="logo">Readout-10min</div>
+            <nav class="nav-links">
+                <a href="../file-management/index.html">文件管理</a>
+                <a href="#" class="active">文件处理</a>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle" onclick="toggleDropdown(this)">账号管理</a>
+                    <div class="dropdown-menu" id="account-menu">
+                        <button class="dropdown-item" onclick="handleLogout()">退出</button>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="file-processing-content">
+            <!-- 左侧：拆分设置 -->
+            <aside class="settings-panel">
+                <div class="panel-header">
+                    <h2>段落拆分设置</h2>
+                    <button class="btn btn-secondary" onclick="window.history.back()">返回</button>
+                </div>
+                
+                <div class="panel-content">
+                    <!-- 目标时长设置 -->
+                    <div class="setting-item">
+                        <label for="duration-slider">目标时长</label>
+                        <div class="duration-display">
+                            <span id="duration-value">10</span> 分钟
+                        </div>
+                        <input 
+                            type="range" 
+                            id="duration-slider" 
+                            min="5" 
+                            max="20" 
+                            value="10" 
+                            step="1"
+                        >
+                        <div class="slider-labels">
+                            <span>5分钟</span>
+                            <span>20分钟</span>
+                        </div>
+                    </div>
+
+
+
+                    <!-- 操作按钮 -->
+                    <div class="action-buttons" style="flex-direction: row; gap: var(--spacing-3);">
+                        <button class="btn btn-primary" id="split-btn">拆分</button>
+                        <button class="btn btn-secondary" id="reset-btn">重置</button>
+                        <button class="btn btn-primary" id="save-btn" disabled>保存</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 右侧：内容预览与结果 -->
+            <section class="content-panel">
+                <!-- 内容预览 -->
+                <div class="preview-section">
+                    <div class="section-header">
+                        <h2>文件内容预览</h2>
+                        <div class="file-info">
+                            <span class="file-name">sample_article.pdf</span>
+                            <span class="file-size">2.5 MB</span>
+                        </div>
+                    </div>
+                    <div class="content-preview">
+                        <h3>Sample Article Title</h3>
+                        <p>This is the first paragraph of the sample article. It contains some text that will be split into readable paragraphs for the user to practice reading.</p>
+                        <p>This is the second paragraph. The intelligent splitting algorithm will analyze the text and split it into appropriate segments based on the target duration setting.</p>
+                        <p>This is the third paragraph. The user can adjust the target duration and other settings to customize their reading experience.</p>
+                        <p>This is the fourth paragraph. Each paragraph will be displayed separately in the mobile app, allowing the user to focus on one segment at a time.</p>
+                        <p>This is the fifth paragraph. The goal is to create paragraphs that are approximately 10 minutes in length, based on average reading speed.</p>
+                    </div>
+                </div>
+
+                <!-- 拆分结果 -->
+                <div class="result-section" id="result-section" style="display: none;">
+                    <div class="section-header">
+                        <h2>拆分结果</h2>
+                        <div class="result-stats">
+                            <span>总段落数: <strong id="total-paragraphs">0</strong></span>
+                        </div>
+                    </div>
+                    <div class="paragraphs-list" id="paragraphs-list">
+                        <!-- 拆分结果将通过 JavaScript 动态生成 -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>Readout-10min-App © 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // 下拉菜单功能
+        function toggleDropdown(button) {
+            const dropdownMenu = document.getElementById('account-menu');
+            dropdownMenu.classList.toggle('show');
+        }
+
+        // 点击页面其他地方关闭下拉菜单
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.dropdown')) {
+                const dropdownMenu = document.getElementById('account-menu');
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                }
+            }
+        });
+
+        // 退出功能
+        function handleLogout() {
+            alert('退出成功');
+            // 这里可以添加实际的退出逻辑
+        }
+
+        // 目标时长滑块交互
+        const durationSlider = document.getElementById('duration-slider');
+        const durationValue = document.getElementById('duration-value');
+        const splitBtn = document.getElementById('split-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const resultSection = document.getElementById('result-section');
+        const paragraphsList = document.getElementById('paragraphs-list');
+        const totalParagraphs = document.getElementById('total-paragraphs');
+        const avgDuration = document.getElementById('avg-duration');
+
+        // 滑块值变化
+        durationSlider.addEventListener('input', (e) => {
+            durationValue.textContent = e.target.value;
+        });
+
+        // 拆分按钮点击
+        splitBtn.addEventListener('click', () => {
+            const targetDuration = parseInt(durationSlider.value);
+            
+            // 模拟拆分过程
+            splitBtn.textContent = '拆分中...';
+            splitBtn.disabled = true;
+            
+            setTimeout(() => {
+                // 生成模拟拆分结果
+                const mockParagraphs = [
+                    {
+                        id: 1,
+                        text: 'This is the first paragraph of the sample article. It contains some text that will be split into readable paragraphs for the user to practice reading.',
+                        wordCount: 25,
+                        estimatedDuration: 12
+                    },
+                    {
+                        id: 2,
+                        text: 'This is the second paragraph. The intelligent splitting algorithm will analyze the text and split it into appropriate segments based on the target duration setting.',
+                        wordCount: 28,
+                        estimatedDuration: 13
+                    },
+                    {
+                        id: 3,
+                        text: 'This is the third paragraph. The user can adjust the target duration and other settings to customize their reading experience.',
+                        wordCount: 22,
+                        estimatedDuration: 10
+                    },
+                    {
+                        id: 4,
+                        text: 'This is the fourth paragraph. Each paragraph will be displayed separately in the mobile app, allowing the user to focus on one segment at a time.',
+                        wordCount: 26,
+                        estimatedDuration: 12
+                    },
+                    {
+                        id: 5,
+                        text: 'This is the fifth paragraph. The goal is to create paragraphs that are approximately 10 minutes in length, based on average reading speed.',
+                        wordCount: 24,
+                        estimatedDuration: 11
+                    }
+                ];
+                
+                // 渲染拆分结果
+                renderParagraphs(mockParagraphs, targetDuration);
+                
+                // 显示结果区域
+                resultSection.style.display = 'block';
+                
+                // 更新按钮状态
+                splitBtn.textContent = '重新拆分';
+                splitBtn.disabled = false;
+                saveBtn.disabled = false;
+                
+            }, 1500);
+        });
+
+        // 渲染段落列表
+        function renderParagraphs(paragraphs, targetDuration) {
+            paragraphsList.innerHTML = '';
+            
+            paragraphs.forEach(paragraph => {
+                const paragraphItem = document.createElement('div');
+                paragraphItem.className = 'paragraph-item';
+                
+                paragraphItem.innerHTML = `
+                    <div class="paragraph-header">
+                        <span class="paragraph-number">段落 ${paragraph.id}</span>
+                        <span class="paragraph-meta">
+                            ${paragraph.wordCount} 词
+                        </span>
+                    </div>
+                    <div class="paragraph-text">${paragraph.text}</div>
+                `;
+                
+                paragraphsList.appendChild(paragraphItem);
+            });
+            
+            // 更新统计信息
+            totalParagraphs.textContent = paragraphs.length;
+        }
+
+        // 重置按钮点击
+        resetBtn.addEventListener('click', () => {
+            // 重置滑块
+            durationSlider.value = 10;
+            durationValue.textContent = '10';
+            
+            // 重置单选按钮
+            document.querySelector('input[name="difficulty"][value="easy"]').checked = true;
+            document.querySelector('input[name="split-method"][value="auto"]').checked = true;
+            
+            // 隐藏结果区域
+            resultSection.style.display = 'none';
+            
+            // 重置按钮状态
+            splitBtn.textContent = '开始拆分';
+            saveBtn.disabled = true;
+        });
+
+        // 保存并同步按钮点击
+        saveBtn.addEventListener('click', () => {
+            // 模拟保存过程
+            saveBtn.textContent = '保存中...';
+            saveBtn.disabled = true;
+            
+            setTimeout(() => {
+                alert('拆分结果已保存并同步到云端！');
+                saveBtn.textContent = '保存并同步';
+                saveBtn.disabled = false;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

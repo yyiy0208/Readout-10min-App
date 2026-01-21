@@ -18,7 +18,7 @@
 - 点击"API"选项卡
 - 复制以下信息：
   - Project URL
-  - Anon Public Key
+  - Publishable API Key
 
 ## 2. 配置环境变量
 
@@ -26,14 +26,14 @@
 在 `web/.env` 文件中添加：
 ```
 VITE_SUPABASE_URL=YOUR_PROJECT_URL
-VITE_SUPABASE_ANON_KEY=YOUR_ANON_PUBLIC_KEY
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_API_KEY
 ```
 
 ### 移动端环境变量
 在 `android/local.properties` 文件中添加：
 ```
 SUPABASE_URL=YOUR_PROJECT_URL
-SUPABASE_ANON_KEY=YOUR_ANON_PUBLIC_KEY
+SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_API_KEY
 ```
 
 ## 3. 数据库设置
