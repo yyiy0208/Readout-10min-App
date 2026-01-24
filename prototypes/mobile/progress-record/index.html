@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>练习记录 - Readout-10min</title>
+    <style>
+        /* 移动端 新配色方案 - 用户提供的配色 */
+        :root {
+            --mobile-screen-width: 375px;
+            --mobile-screen-height: 667px;
+            
+            /* 主色调 - 基于用户提供的配色方案 */
+            --primary-color: #ff8ba7; /* 强调色 - 主色调 */
+            --primary-light: #ffc6c7; /* 次要色 - 主色调变体 */
+            --secondary-color: #c3f0ca; /* 第三色 - 辅助色 */
+            --accent-color: #ff8ba7; /* 强调色 */
+            --accent-2: #ffc6c7; /* 次要色 */
+            --accent-3: #c3f0ca; /* 第三色 */
+            
+            /* 功能色 */
+            --success-color: #22c55e; /* 成功色 */
+            --error-color: #ef4444; /* 错误色 */
+            --warning-color: #f59e0b; /* 警告色 */
+            --info-color: #3b82f6; /* 信息色 */
+            
+            /* 背景色 - 基于用户提供的配色方案 */
+            --background-color: #fffffe; /* 主背景色 */
+            --background-alt: #faeee7; /* 卡片背景色 */
+            --background-light: #ffc6c7; /* 辅助背景色 */
+            
+            /* 文字色 - 基于用户提供的配色方案 */
+            --text-primary: #33272a; /* 主文字色 - 标题、卡片标题 */
+            --text-secondary: #594a4e; /* 次要文字色 - 副标题、卡片段落 */
+            --text-light: #594a4e; /* 辅助文字色 */
+            --text-muted: #cbd5e1; /* 禁用文字色 */
+            
+            /* 边框色 */
+            --border-color: #ffc6c7; /* 边框色 */
+            --border-light: #ffc6c7; /* 浅边框色 */
+            --border-dark: #594a4e; /* 深边框色 */
+            
+            /* 阴影效果 - 柔和自然 */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* 字体 - 现代清晰 */
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            
+            /* 行高和字重 */
+            --line-height-tight: 1.25;
+            --line-height-normal: 1.5;
+            --line-height-relaxed: 1.75;
+            --font-weight-light: 300;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* 间距 - 充足的留白 */
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-5: 1.25rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --spacing-10: 2.5rem;
+            --spacing-12: 3rem;
+            --spacing-16: 4rem;
+            
+            /* 圆角 - 柔和的弧度 */
+            --border-radius-sm: 0.25rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-full: 9999px;
+            
+            /* 过渡效果 */
+            --transition-fast: 150ms ease-in-out;
+            --transition-base: 250ms ease-in-out;
+            --transition-slow: 350ms ease-in-out;
+        }
+
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* 移动端应用样式 */
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-normal);
+            font-weight: var(--font-weight-normal);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* 移动端应用容器 */
+        .mobile-app {
+            width: var(--mobile-screen-width);
+            height: var(--mobile-screen-height);
+            margin: 0 auto;
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-family);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 顶部导航栏 */
+        .mobile-header {
+            background-color: var(--background-alt);
+            padding: var(--spacing-3) var(--spacing-4);
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+        }
+
+        /* 返回按钮 */
+        #back-btn {
+            padding: var(--spacing-2);
+            font-size: var(--font-size-lg);
+            min-width: auto;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #back-btn:hover {
+            background: none;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 主内容区域 */
+        .mobile-main {
+            flex: 1;
+            padding: var(--spacing-4);
+            overflow-y: auto;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background-color: var(--background-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-4);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-4);
+            transition: all var(--transition-base);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-4);
+        }
+
+        /* 日历样式 */
+        .calendar {
+            width: 100%;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .calendar-month {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: var(--spacing-2);
+        }
+
+        .calendar-nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: var(--font-size-lg);
+            cursor: pointer;
+            padding: var(--spacing-1);
+            border-radius: var(--border-radius-md);
+            transition: all var(--transition-base);
+        }
+
+        .calendar-nav-btn:hover {
+            background-color: var(--background-light);
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: var(--spacing-1);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .weekday {
+            text-align: center;
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+            padding: var(--spacing-2);
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: var(--spacing-1);
+        }
+
+        .calendar-day {
+            text-align: center;
+            font-size: var(--font-size-sm);
+            padding: var(--spacing-2);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-day:hover {
+            background-color: var(--background-light);
+        }
+
+        .calendar-day.other-month {
+            color: var(--text-muted);
+        }
+
+        .calendar-day.today {
+            font-weight: var(--font-weight-semibold);
+            background-color: var(--primary-light);
+        }
+
+        .calendar-day.has-practice {
+            background-color: var(--secondary-color);
+            font-weight: var(--font-weight-medium);
+        }
+
+        /* 统计图表样式 */
+        .stats-chart {
+            height: 200px;
+            background-color: var(--background-light);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: end;
+            justify-content: space-around;
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .chart-bar {
+            width: 20px;
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+            transition: all var(--transition-base);
+        }
+
+        .chart-bar:hover {
+            transform: scaleY(1.05);
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-around;
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        /* 统计周期按钮 */
+        .stats-period-btn {
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-2) var(--spacing-3);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .stats-period-btn:hover {
+            background-color: var(--primary-light);
+        }
+
+        .stats-period-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* 历史记录样式 */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-3);
+        }
+
+        .history-item {
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-3);
+            transition: all var(--transition-base);
+        }
+
+        .history-item:hover {
+            box-shadow: var(--shadow-sm);
+        }
+
+        .history-date {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .history-content {
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .history-duration {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        /* 底部导航栏 - Happy Hues 风格 */
+        .mobile-footer {
+            position: fixed;
+            bottom: 0;
+            width: var(--mobile-screen-width);
+            background-color: var(--background-alt);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: var(--spacing-2) 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-1);
+            padding: var(--spacing-2) var(--spacing-3);
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all var(--transition-base);
+            border-radius: var(--border-radius-md);
+        }
+
+        .nav-item:hover {
+            background-color: var(--background-light);
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+            background-color: rgba(255, 139, 167, 0.1);
+        }
+
+        .nav-icon {
+            font-size: var(--font-size-lg);
+        }
+
+        .nav-label {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-app">
+        <!-- 顶部导航栏 -->
+        <header class="mobile-header">
+            <button id="back-btn" title="返回">←</button>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="mobile-main">
+            <!-- 练习日历 -->
+            <div class="card">
+                <h2 class="card-title">练习日历</h2>
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <span class="calendar-month">2026年1月</span>
+                        <div class="calendar-nav">
+                            <button class="calendar-nav-btn" title="上月">‹</button>
+                            <button class="calendar-nav-btn" title="下月">›</button>
+                        </div>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <span class="weekday">日</span>
+                        <span class="weekday">一</span>
+                        <span class="weekday">二</span>
+                        <span class="weekday">三</span>
+                        <span class="weekday">四</span>
+                        <span class="weekday">五</span>
+                        <span class="weekday">六</span>
+                    </div>
+                    <div class="calendar-days">
+                        <!-- 上月日期 -->
+                        <span class="calendar-day other-month">30</span>
+                        <span class="calendar-day other-month">31</span>
+                        <!-- 当月日期 -->
+                        <span class="calendar-day">1</span>
+                        <span class="calendar-day has-practice">2</span>
+                        <span class="calendar-day">3</span>
+                        <span class="calendar-day">4</span>
+                        <span class="calendar-day has-practice">5</span>
+                        <span class="calendar-day">6</span>
+                        <span class="calendar-day">7</span>
+                        <span class="calendar-day has-practice">8</span>
+                        <span class="calendar-day">9</span>
+                        <span class="calendar-day">10</span>
+                        <span class="calendar-day">11</span>
+                        <span class="calendar-day has-practice">12</span>
+                        <span class="calendar-day">13</span>
+                        <span class="calendar-day">14</span>
+                        <span class="calendar-day">15</span>
+                        <span class="calendar-day has-practice">16</span>
+                        <span class="calendar-day">17</span>
+                        <span class="calendar-day">18</span>
+                        <span class="calendar-day today">19</span>
+                        <span class="calendar-day">20</span>
+                        <span class="calendar-day">21</span>
+                        <span class="calendar-day">22</span>
+                        <span class="calendar-day">23</span>
+                        <span class="calendar-day">24</span>
+                        <span class="calendar-day">25</span>
+                        <span class="calendar-day">26</span>
+                        <span class="calendar-day">27</span>
+                        <span class="calendar-day">28</span>
+                        <span class="calendar-day">29</span>
+                        <span class="calendar-day">30</span>
+                        <span class="calendar-day">31</span>
+                        <!-- 下月日期 -->
+                        <span class="calendar-day other-month">1</span>
+                        <span class="calendar-day other-month">2</span>
+                        <span class="calendar-day other-month">3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 统计图表 -->
+            <div class="card">
+                <h2 class="card-title">练习时长统计</h2>
+                <div style="margin-bottom: var(--spacing-3);">
+                    <div style="display: flex; gap: var(--spacing-2); margin-bottom: var(--spacing-3);">
+                        <button class="stats-period-btn active" data-period="week">周</button>
+                        <button class="stats-period-btn" data-period="month">月</button>
+                        <button class="stats-period-btn" data-period="year">年</button>
+                    </div>
+                    <div class="stats-chart">
+                        <div class="chart-bar" style="height: 60%;"></div>
+                        <div class="chart-bar" style="height: 80%;"></div>
+                        <div class="chart-bar" style="height: 40%;"></div>
+                        <div class="chart-bar" style="height: 90%;"></div>
+                        <div class="chart-bar" style="height: 50%;"></div>
+                        <div class="chart-bar" style="height: 70%;"></div>
+                        <div class="chart-bar" style="height: 65%;"></div>
+                    </div>
+                    <div class="chart-labels">
+                        <span>周一</span>
+                        <span>周二</span>
+                        <span>周三</span>
+                        <span>周四</span>
+                        <span>周五</span>
+                        <span>周六</span>
+                        <span>周日</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+
+    </div>
+
+    <script>
+        // 移动端交互
+        const mobileApp = document.querySelector('.mobile-app');
+
+        // 返回按钮点击事件
+        document.getElementById('back-btn').addEventListener('click', () => {
+            window.location.href = '../home/index.html';
+        });
+
+        // 练习数据 - 模拟数据
+        const practiceData = {
+            '2': [
+                { filename: '英语阅读材料', paragraph: '段落 1' },
+                { filename: '科技文章', paragraph: '段落 3' }
+            ],
+            '5': [
+                { filename: '英语阅读材料', paragraph: '段落 2' }
+            ],
+            '8': [
+                { filename: '科技文章', paragraph: '段落 4' },
+                { filename: '历史故事', paragraph: '段落 1' }
+            ],
+            '12': [
+                { filename: '历史故事', paragraph: '段落 2' }
+            ],
+            '16': [
+                { filename: '英语阅读材料', paragraph: '段落 3' },
+                { filename: '科技文章', paragraph: '段落 5' }
+            ]
+        };
+
+        // 日历日期点击事件
+        mobileApp.addEventListener('click', (e) => {
+            if (e.target.classList.contains('calendar-day') && !e.target.classList.contains('other-month')) {
+                const day = e.target.textContent;
+                const practices = practiceData[day];
+                
+                if (practices) {
+                    let message = ` ${day}日的练习记录：\n\n`;
+                    practices.forEach(item => {
+                        message += `📄 ${item.filename}\n   ${item.paragraph}\n\n`;
+                    });
+                    alert(message);
+                } else {
+                    alert(`${day}日没有练习记录`);
+                }
+            }
+        });
+
+        // 日历导航按钮点击事件
+        mobileApp.addEventListener('click', (e) => {
+            if (e.target.classList.contains('calendar-nav-btn')) {
+                const direction = e.target.textContent;
+                alert(`${direction === '‹' ? '上月' : '下月'}的练习记录`);
+                // 实际项目中这里会切换到相应月份
+            }
+        });
+
+        // 统计周期切换
+        mobileApp.addEventListener('click', (e) => {
+            if (e.target.classList.contains('stats-period-btn')) {
+                // 更新按钮状态
+                document.querySelectorAll('.stats-period-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+
+                const period = e.target.dataset.period;
+                updateStatsChart(period);
+            }
+        });
+
+        // 更新统计图表
+        function updateStatsChart(period) {
+            const chartBars = document.querySelectorAll('.chart-bar');
+            const chartLabels = document.querySelectorAll('.chart-labels span');
+
+            // 模拟不同周期的数据
+            let data = [];
+            let labels = [];
+
+            if (period === 'week') {
+                data = [60, 80, 40, 90, 50, 70, 65];
+                labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+            } else if (period === 'month') {
+                data = [70, 65, 80, 75, 90, 85, 75];
+                labels = ['第1周', '第2周', '第3周', '第4周', '第5周', '', ''];
+            } else if (period === 'year') {
+                data = [60, 70, 80, 75, 90, 85, 80];
+                labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月'];
+            }
+
+            // 更新图表
+            chartBars.forEach((bar, index) => {
+                if (data[index]) {
+                    bar.style.height = `${data[index]}%`;
+                    bar.style.display = 'block';
+                } else {
+                    bar.style.display = 'none';
+                }
+            });
+
+            // 更新标签
+            chartLabels.forEach((label, index) => {
+                if (labels[index]) {
+                    label.textContent = labels[index];
+                    label.style.display = 'block';
+                } else {
+                    label.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

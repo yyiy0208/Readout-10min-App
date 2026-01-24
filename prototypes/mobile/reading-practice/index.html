@@ -87,8 +87,8 @@
             --transition-slow: 350ms ease-in-out;
         }
 
-        /* 朗读练习页样式 - Happy Hues 风格 */
-        .reading-practice-app {
+        /* 移动端应用容器 */
+        .mobile-app {
             width: var(--mobile-screen-width);
             height: var(--mobile-screen-height);
             margin: 0 auto;
@@ -100,12 +100,12 @@
             box-shadow: var(--shadow-md);
         }
 
-        /* 顶部状态栏 - Happy Hues 风格 */
+        /* 顶部导航栏 */
         .practice-status-bar {
             background-color: var(--background-alt);
             padding: var(--spacing-3) var(--spacing-4);
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
             font-size: var(--font-size-sm);
@@ -113,37 +113,48 @@
             color: var(--text-primary);
         }
 
+        /* 返回按钮 */
+        #back-btn {
+            padding: var(--spacing-2);
+            font-size: var(--font-size-lg);
+            min-width: auto;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #back-btn:hover {
+            background: none;
+            transform: none;
+            box-shadow: none;
+        }
+
         /* 阅读区域 */
         .reading-area {
             flex: 1;
             padding: var(--spacing-6) var(--spacing-4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background-color: var(--background-color);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .paragraph-container {
             width: 100%;
             max-width: 320px;
-        }
-
-        .paragraph-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--spacing-6);
-            font-size: var(--font-size-xs);
-            color: var(--text-secondary);
+            margin: 0 auto;
         }
 
         /* 阅读文本 */
         .reading-text {
             font-size: var(--font-size-lg);
             line-height: var(--line-height-normal);
-            margin-bottom: var(--spacing-8);
             text-align: left;
             color: var(--text-primary);
+            white-space: pre-wrap;
         }
 
         /* 进度指示器 */
@@ -164,19 +175,19 @@
             border-radius: var(--border-radius-full);
         }
 
-        /* 底部控制栏 - Happy Hues 风格 */
+        /* 底部控制栏 */
         .control-bar {
             background-color: var(--background-alt);
-            padding: var(--spacing-4);
+            padding: var(--spacing-2) 0;
             border-top: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: center;
             gap: var(--spacing-2);
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
 
-        /* Happy Hues 风格控制按钮 */
+        /* 控制按钮 */
         .control-btn {
             padding: var(--spacing-3) var(--spacing-4);
             border: 1px solid var(--border-color);
@@ -190,6 +201,7 @@
             justify-content: center;
             background-color: var(--background-light);
             color: var(--text-primary);
+            flex: 1;
         }
 
         .control-btn:hover {
@@ -211,156 +223,46 @@
             box-shadow: var(--shadow-md);
         }
 
-        /* 大号按钮 */
-        .btn-large {
-            flex: 1;
-            padding: var(--spacing-4) var(--spacing-6);
-            font-size: var(--font-size-base);
-        }
-
-        /* 设置面板 - Happy Hues 风格 */
-        .settings-panel {
+        /* 弹出选项面板 */
+        .options-panel {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
             background-color: var(--background-alt);
-            border-top-left-radius: var(--border-radius-xl);
-            border-top-right-radius: var(--border-radius-xl);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
             padding: var(--spacing-4);
             box-shadow: var(--shadow-lg);
-            max-height: 80%;
-            overflow-y: auto;
             z-index: 100;
+            display: none;
         }
 
-        .settings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--spacing-6);
-            padding-bottom: var(--spacing-4);
-            border-bottom: 1px solid var(--border-color);
+        .options-panel.active {
+            display: block;
         }
 
-        .settings-header h2 {
-            font-size: var(--font-size-xl);
-            font-weight: var(--font-weight-semibold);
-            margin: 0;
-            color: var(--text-primary);
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: var(--font-size-xl);
-            cursor: pointer;
-            color: var(--text-secondary);
-            padding: var(--spacing-1);
-            transition: all var(--transition-base);
-        }
-
-        .close-btn:hover {
-            color: var(--primary-color);
-            transform: scale(1.1);
-        }
-
-        /* Happy Hues 风格按钮基础样式 */
-        .btn {
-            padding: var(--spacing-4) var(--spacing-6);
-            border: none;
-            border-radius: var(--border-radius-md);
-            font-size: var(--font-size-sm);
-            font-weight: var(--font-weight-semibold);
-            cursor: pointer;
-            transition: all var(--transition-base);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-family);
-        }
-
-        /* 主按钮 */
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-light);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* 次要按钮 */
-        .btn-secondary {
-            background-color: var(--background-light);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--border-color);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .settings-content {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-6);
-        }
-
-        .setting-item {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-3);
-        }
-
-        .setting-item label {
-            font-size: var(--font-size-base);
-            font-weight: var(--font-weight-medium);
-            color: var(--text-primary);
-        }
-
-        /* 字体大小控制 */
-        .font-size-controls {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-4);
-            justify-content: center;
-        }
-
-        #font-size-value {
-            font-weight: var(--font-weight-semibold);
-            min-width: 40px;
-            text-align: center;
-            color: var(--text-primary);
-        }
-
-        /* 间距和速度选项 */
-        .spacing-options, .speed-options {
+        /* 字体选项 */
+        .font-options {
             display: flex;
             gap: var(--spacing-3);
-            justify-content: center;
         }
 
-        .spacing-options .btn, .speed-options .btn {
-            flex: 1;
-            max-width: 100px;
-            padding: var(--spacing-3) var(--spacing-4);
+        /* 行间距选项 */
+        .spacing-options {
+            display: flex;
+            gap: var(--spacing-3);
         }
 
         /* 背景色选项 */
         .background-options {
             display: flex;
             gap: var(--spacing-3);
-            justify-content: center;
         }
 
         .background-option {
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             border: 2px solid var(--border-color);
             cursor: pointer;
@@ -378,25 +280,23 @@
     </style>
 </head>
 <body>
-    <div class="reading-practice-app">
-        <!-- 顶部状态栏 -->
+    <div class="mobile-app">
+        <!-- 顶部导航栏 -->
         <div class="practice-status-bar">
-            <div class="status-left">⏱️</div>
-            <div class="status-center">
-                <span id="current-duration">3:25</span> / <span id="total-duration">12:00</span>
-            </div>
-            <div class="status-right">📊</div>
+            <button id="back-btn">←</button>
         </div>
 
         <!-- 阅读区域 -->
         <main class="reading-area">
             <div class="paragraph-container">
-                <div class="paragraph-header">
-                    <span class="paragraph-number">段落 1/4</span>
-                    <span class="word-count">25 词</span>
-                </div>
                 <div class="reading-text">
                     This is the first paragraph of the sample article. It contains some text that will be split into readable paragraphs for the user to practice reading.
+                    
+                    This is the second paragraph. It continues with more sample text to provide sufficient content for reading practice.
+                    
+                    This is the third paragraph. It adds more context and information to the sample article.
+                    
+                    This is the fourth and final paragraph. It concludes the sample article with some final thoughts.
                 </div>
                 <div class="progress-indicator">
                     <div class="progress-bar">
@@ -408,177 +308,147 @@
 
         <!-- 底部控制栏 -->
         <footer class="control-bar">
-            <button class="control-btn" id="prev-btn">⏮️ 上一段</button>
-            <button class="control-btn btn-primary btn-large" id="play-pause-btn">⏸️ 暂停</button>
-            <button class="control-btn" id="next-btn">下一段 ⏭️</button>
-            <button class="control-btn" id="settings-btn">⚙️ 设置</button>
+            <button class="control-btn" id="font-btn">字体</button>
+            <button class="control-btn" id="spacing-btn">行间距</button>
+            <button class="control-btn" id="bg-btn">背景色</button>
         </footer>
 
-        <!-- 阅读设置面板 -->
-        <div class="settings-panel" id="settings-panel" style="display: none;">
-            <div class="settings-header">
-                <h2>阅读设置</h2>
-                <button class="close-btn" id="close-settings">✕</button>
+        <!-- 字体选项面板 -->
+        <div class="options-panel" id="font-panel">
+            <div class="font-options">
+                <button class="control-btn" data-font="small">小</button>
+                <button class="control-btn btn-primary" data-font="medium">中</button>
+                <button class="control-btn" data-font="large">大</button>
             </div>
-            <div class="settings-content">
-                <!-- 字体大小 -->
-                <div class="setting-item">
-                    <label>字体大小</label>
-                    <div class="font-size-controls">
-                        <button class="btn btn-secondary" id="decrease-font">A-</button>
-                        <span id="font-size-value">18</span>px
-                        <button class="btn btn-secondary" id="increase-font">A+</button>
-                    </div>
-                </div>
+        </div>
 
-                <!-- 行间距 -->
-                <div class="setting-item">
-                    <label>行间距</label>
-                    <div class="spacing-options">
-                        <button class="btn btn-secondary" data-spacing="small">小</button>
-                        <button class="btn btn-primary" data-spacing="medium">中</button>
-                        <button class="btn btn-secondary" data-spacing="large">大</button>
-                    </div>
-                </div>
+        <!-- 行间距选项面板 -->
+        <div class="options-panel" id="spacing-panel">
+            <div class="spacing-options">
+                <button class="control-btn" id="decrease-spacing">缩小</button>
+                <button class="control-btn" id="increase-spacing">增加</button>
+            </div>
+        </div>
 
-                <!-- 背景色 -->
-                <div class="setting-item">
-                    <label>背景色</label>
-                    <div class="background-options">
-                        <button class="background-option active" data-bg="white" style="background-color: white; border: 1px solid var(--border-color);"></button>
-                        <button class="background-option" data-bg="beige" style="background-color: #FFFBEB; border: 1px solid var(--border-color);"></button>
-                        <button class="background-option" data-bg="dark" style="background-color: #121212; border: 1px solid var(--border-color);"></button>
-                    </div>
-                </div>
-
-                <!-- 自动滚动速度 -->
-                <div class="setting-item">
-                    <label>自动滚动速度</label>
-                    <div class="speed-options">
-                        <button class="btn btn-secondary" data-speed="slow">慢</button>
-                        <button class="btn btn-primary" data-speed="medium">中</button>
-                        <button class="btn btn-secondary" data-speed="fast">快</button>
-                    </div>
-                </div>
+        <!-- 背景色选项面板 -->
+        <div class="options-panel" id="bg-panel">
+            <div class="background-options">
+                <button class="background-option active" data-bg="white" style="background-color: white; border: 1px solid var(--border-color);"></button>
+                <button class="background-option" data-bg="beige" style="background-color: #FFFBEB; border: 1px solid var(--border-color);"></button>
+                <button class="background-option" data-bg="dark" style="background-color: #121212; border: 1px solid var(--border-color);"></button>
             </div>
         </div>
     </div>
 
     <script>
         // 朗读练习页交互
-        const readingPracticeApp = document.querySelector('.reading-practice-app');
-        const playPauseBtn = document.getElementById('play-pause-btn');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const settingsBtn = document.getElementById('settings-btn');
-        const closeSettings = document.getElementById('close-settings');
-        const settingsPanel = document.getElementById('settings-panel');
+        const mobileApp = document.querySelector('.mobile-app');
+        const backBtn = document.getElementById('back-btn');
         const readingText = document.querySelector('.reading-text');
-        const fontSizeValue = document.getElementById('font-size-value');
-        const decreaseFont = document.getElementById('decrease-font');
-        const increaseFont = document.getElementById('increase-font');
+        
+        // 底部按钮
+        const fontBtn = document.getElementById('font-btn');
+        const spacingBtn = document.getElementById('spacing-btn');
+        const bgBtn = document.getElementById('bg-btn');
+        
+        // 选项面板
+        const fontPanel = document.getElementById('font-panel');
+        const spacingPanel = document.getElementById('spacing-panel');
+        const bgPanel = document.getElementById('bg-panel');
 
-        // 播放/暂停按钮
-        let isPlaying = true;
+        // 返回按钮
+        backBtn.addEventListener('click', () => {
+            window.location.href = '../home/index.html';
+        });
 
-        playPauseBtn.addEventListener('click', () => {
-            isPlaying = !isPlaying;
-            if (isPlaying) {
-                playPauseBtn.innerHTML = '⏸️ 暂停';
-                alert('继续朗读');
-                // 开始自动滚动
-            } else {
-                playPauseBtn.innerHTML = '▶️ 继续';
-                alert('暂停朗读');
-                // 停止自动滚动
+        // 显示/隐藏选项面板
+        function showPanel(panel) {
+            // 隐藏所有面板
+            fontPanel.classList.remove('active');
+            spacingPanel.classList.remove('active');
+            bgPanel.classList.remove('active');
+            
+            // 显示选中的面板
+            panel.classList.add('active');
+        }
+
+        // 点击空白区域关闭面板
+        mobileApp.addEventListener('click', (e) => {
+            if (!e.target.closest('.control-btn') && !e.target.closest('.options-panel')) {
+                fontPanel.classList.remove('active');
+                spacingPanel.classList.remove('active');
+                bgPanel.classList.remove('active');
             }
         });
 
-        // 上一段/下一段按钮
-        prevBtn.addEventListener('click', () => {
-            alert('切换到上一段');
-            // 切换到上一段落
+        // 字体按钮点击
+        fontBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showPanel(fontPanel);
         });
 
-        nextBtn.addEventListener('click', () => {
-            alert('切换到下一段');
-            // 切换到下一段落
+        // 行间距按钮点击
+        spacingBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showPanel(spacingPanel);
         });
 
-        // 设置按钮
-        settingsBtn.addEventListener('click', () => {
-            settingsPanel.style.display = 'block';
-        });
-
-        closeSettings.addEventListener('click', () => {
-            settingsPanel.style.display = 'none';
+        // 背景色按钮点击
+        bgBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showPanel(bgPanel);
         });
 
         // 字体大小调整
+        const fontOptions = document.querySelectorAll('[data-font]');
         let fontSize = 18;
 
-        decreaseFont.addEventListener('click', () => {
-            if (fontSize > 14) {
-                fontSize--;
-                fontSizeValue.textContent = fontSize;
+        fontOptions.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                // 移除所有active类
+                fontOptions.forEach(b => b.classList.remove('btn-primary'));
+                // 添加active类到当前按钮
+                btn.classList.add('btn-primary');
+                
+                const font = btn.dataset.font;
+                switch(font) {
+                    case 'small': fontSize = 16; break;
+                    case 'medium': fontSize = 18; break;
+                    case 'large': fontSize = 20; break;
+                }
                 readingText.style.fontSize = `${fontSize}px`;
-            }
-        });
-
-        increaseFont.addEventListener('click', () => {
-            if (fontSize < 24) {
-                fontSize++;
-                fontSizeValue.textContent = fontSize;
-                readingText.style.fontSize = `${fontSize}px`;
-            }
+            });
         });
 
         // 行间距调整
-        const spacingBtns = settingsPanel.querySelectorAll('.spacing-options .btn');
+        const decreaseSpacing = document.getElementById('decrease-spacing');
+        const increaseSpacing = document.getElementById('increase-spacing');
+        let lineHeight = 1.6;
 
-        spacingBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // 移除所有active类
-                spacingBtns.forEach(b => b.classList.remove('btn-primary'));
-                spacingBtns.forEach(b => b.classList.add('btn-secondary'));
-                // 添加active类到当前按钮
-                btn.classList.remove('btn-secondary');
-                btn.classList.add('btn-primary');
-                
-                const spacing = btn.dataset.spacing;
-                let lineHeight;
-                switch(spacing) {
-                    case 'small': lineHeight = '1.4'; break;
-                    case 'medium': lineHeight = '1.6'; break;
-                    case 'large': lineHeight = '1.8'; break;
-                }
+        decreaseSpacing.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (lineHeight > 1.2) {
+                lineHeight -= 0.2;
                 readingText.style.lineHeight = lineHeight;
-            });
+            }
         });
 
-        // 自动滚动速度调整
-        const speedBtns = settingsPanel.querySelectorAll('.speed-options .btn');
-
-        speedBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // 移除所有active类
-                speedBtns.forEach(b => b.classList.remove('btn-primary'));
-                speedBtns.forEach(b => b.classList.add('btn-secondary'));
-                // 添加active类到当前按钮
-                btn.classList.remove('btn-secondary');
-                btn.classList.add('btn-primary');
-                
-                const speed = btn.dataset.speed;
-                alert(`设置自动滚动速度为 ${speed}`);
-                // 调整自动滚动速度
-            });
+        increaseSpacing.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (lineHeight < 2.0) {
+                lineHeight += 0.2;
+                readingText.style.lineHeight = lineHeight;
+            }
         });
 
         // 背景色调整
-        const backgroundOptions = settingsPanel.querySelectorAll('.background-option');
+        const backgroundOptions = document.querySelectorAll('.background-option');
 
         backgroundOptions.forEach(option => {
-            option.addEventListener('click', () => {
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
                 // 移除所有active类
                 backgroundOptions.forEach(opt => opt.classList.remove('active'));
                 // 添加active类到当前选项
@@ -605,18 +475,9 @@
                 
                 // 更新背景色和文本色
                 document.documentElement.style.setProperty('--background-color', bgValue);
-                document.documentElement.style.setProperty('--text-color', textColor);
-                readingPracticeApp.style.backgroundColor = bgValue;
+                mobileApp.style.backgroundColor = bgValue;
                 readingText.style.color = textColor;
             });
-        });
-
-        // 点击屏幕中央暂停/继续
-        readingPracticeApp.addEventListener('click', (e) => {
-            if (e.target.closest('.reading-area') && !e.target.closest('.control-bar') && !e.target.closest('.settings-panel')) {
-                // 点击阅读区域中央
-                playPauseBtn.click();
-            }
         });
     </script>
 </body>

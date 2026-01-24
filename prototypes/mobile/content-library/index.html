@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>内容库 - Readout-10min</title>
+    <style>
+        /* 移动端 新配色方案 - 用户提供的配色 */
+        :root {
+            --mobile-screen-width: 375px;
+            --mobile-screen-height: 667px;
+            
+            /* 主色调 - 基于用户提供的配色方案 */
+            --primary-color: #ff8ba7; /* 强调色 - 主色调 */
+            --primary-light: #ffc6c7; /* 次要色 - 主色调变体 */
+            --secondary-color: #c3f0ca; /* 第三色 - 辅助色 */
+            --accent-color: #ff8ba7; /* 强调色 */
+            --accent-2: #ffc6c7; /* 次要色 */
+            --accent-3: #c3f0ca; /* 第三色 */
+            
+            /* 功能色 */
+            --success-color: #22c55e; /* 成功色 */
+            --error-color: #ef4444; /* 错误色 */
+            --warning-color: #f59e0b; /* 警告色 */
+            --info-color: #3b82f6; /* 信息色 */
+            
+            /* 背景色 - 基于用户提供的配色方案 */
+            --background-color: #fffffe; /* 主背景色 */
+            --background-alt: #faeee7; /* 卡片背景色 */
+            --background-light: #ffc6c7; /* 辅助背景色 */
+            
+            /* 文字色 - 基于用户提供的配色方案 */
+            --text-primary: #33272a; /* 主文字色 - 标题、卡片标题 */
+            --text-secondary: #594a4e; /* 次要文字色 - 副标题、卡片段落 */
+            --text-light: #594a4e; /* 辅助文字色 */
+            --text-muted: #cbd5e1; /* 禁用文字色 */
+            
+            /* 边框色 */
+            --border-color: #ffc6c7; /* 边框色 */
+            --border-light: #ffc6c7; /* 浅边框色 */
+            --border-dark: #594a4e; /* 深边框色 */
+            
+            /* 阴影效果 - 柔和自然 */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* 字体 - 现代清晰 */
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            
+            /* 行高和字重 */
+            --line-height-tight: 1.25;
+            --line-height-normal: 1.5;
+            --line-height-relaxed: 1.75;
+            --font-weight-light: 300;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* 间距 - 充足的留白 */
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-5: 1.25rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --spacing-10: 2.5rem;
+            --spacing-12: 3rem;
+            --spacing-16: 4rem;
+            
+            /* 圆角 - 柔和的弧度 */
+            --border-radius-sm: 0.25rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-full: 9999px;
+            
+            /* 过渡效果 */
+            --transition-fast: 150ms ease-in-out;
+            --transition-base: 250ms ease-in-out;
+            --transition-slow: 350ms ease-in-out;
+        }
+
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* 移动端应用样式 */
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-normal);
+            font-weight: var(--font-weight-normal);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* 移动端应用容器 */
+        .mobile-app {
+            width: var(--mobile-screen-width);
+            height: var(--mobile-screen-height);
+            margin: 0 auto;
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-family);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 顶部导航栏 */
+        .mobile-header {
+            background-color: var(--background-alt);
+            padding: var(--spacing-3) var(--spacing-4);
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+        }
+
+        /* 返回按钮 */
+        #back-btn {
+            padding: var(--spacing-2);
+            font-size: var(--font-size-lg);
+            min-width: auto;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #back-btn:hover {
+            background: none;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 主内容区域 */
+        .mobile-main {
+            flex: 1;
+            padding: var(--spacing-4);
+            overflow-y: auto;
+        }
+
+        /* 内容列表样式 */
+        .content-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-4);
+        }
+
+        /* 内容卡片样式 */
+        .content-card {
+            background-color: var(--background-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-4);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+            margin-bottom: var(--spacing-4);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card:hover {
+            box-shadow: var(--shadow-md);
+            background-color: var(--background-light);
+        }
+
+        /* 左滑删除样式 */
+        .delete-action {
+            position: absolute;
+            right: -100px;
+            top: 0;
+            bottom: 0;
+            width: 100px;
+            background-color: var(--error-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            transition: right var(--transition-base);
+        }
+
+        .content-card.swipe-left .delete-action {
+            right: 0;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .content-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: var(--spacing-1);
+            transition: all var(--transition-base);
+        }
+
+        .expand-btn:hover {
+            color: var(--text-primary);
+            transform: rotate(90deg);
+        }
+
+        .paragraph-list {
+            margin-top: var(--spacing-4);
+            padding-top: var(--spacing-4);
+            border-top: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .paragraph-list.active {
+            display: block;
+        }
+
+        .paragraph-list h4 {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .paragraph-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-2);
+            background-color: var(--background-color);
+            transition: all var(--transition-base);
+        }
+
+        .paragraph-item:hover {
+            background-color: var(--background-light);
+            transform: translateY(-1px);
+        }
+
+        .paragraph-item.completed {
+            background-color: rgba(34, 197, 94, 0.1);
+            border-color: var(--success-color);
+        }
+
+        .paragraph-item.current {
+            background-color: rgba(255, 139, 167, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .paragraph-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: var(--background-light);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            margin-right: var(--spacing-3);
+        }
+
+        .paragraph-item.completed .paragraph-number {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .paragraph-item.current .paragraph-number {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .paragraph-title {
+            flex: 1;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+        }
+
+        .paragraph-duration {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            margin-right: var(--spacing-3);
+        }
+
+        .paragraph-status {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            padding: var(--spacing-1) var(--spacing-2);
+            border-radius: var(--border-radius-full);
+        }
+
+        .paragraph-item.completed .paragraph-status {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .paragraph-item.current .paragraph-status {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .paragraph-item:not(.completed):not(.current) .paragraph-status {
+            background-color: var(--background-light);
+            color: var(--text-primary);
+        }
+
+        .content-meta {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .content-status {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .progress-info {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: var(--background-light);
+            border-radius: var(--border-radius-full);
+            overflow: hidden;
+            margin-top: var(--spacing-2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius-full);
+            transition: width var(--transition-base);
+        }
+
+        /* 卡片底部操作区 */
+        .card-actions {
+            display: flex;
+            gap: var(--spacing-3);
+            margin-top: var(--spacing-3);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: var(--spacing-3) var(--spacing-4);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--background-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 空状态样式 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-10) var(--spacing-4);
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .empty-state-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .empty-state-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-6);
+        }
+
+
+
+        /* 搜索栏样式 */
+        .search-bar {
+            position: relative;
+            margin-bottom: var(--spacing-6);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--spacing-3) var(--spacing-10);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-full);
+            background-color: var(--background-alt);
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+            transition: all var(--transition-base);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 139, 167, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--spacing-3);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-app">
+        <!-- 顶部导航栏 -->
+        <header class="mobile-header">
+            <button id="back-btn">←</button>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="mobile-main">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="搜索内容...">
+            </div>
+
+            <!-- 内容列表 -->
+            <div class="content-list">
+                <!-- 已下载内容 -->
+                <div class="content-card">
+                    <div class="delete-action">删除</div>
+                    <div class="card-header">
+                        <h3 class="content-title">Sample Article Title</h3>
+                        <button class="expand-btn">▼</button>
+                    </div>
+                    <div class="content-meta">
+                        <p>作者：John Doe</p>
+                        <p>预估总时长：60分钟</p>
+                    </div>
+                    <div class="content-status">
+                        <span class="progress-info">已读70%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 70%"></div>
+                    </div>
+
+                    <div class="paragraph-list">
+                        <h4>段落列表</h4>
+                        <div class="paragraph-item completed">
+                            <span class="paragraph-number">1</span>
+                            <span class="paragraph-title">Introduction</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">已完成</span>
+                        </div>
+                        <div class="paragraph-item completed">
+                            <span class="paragraph-number">2</span>
+                            <span class="paragraph-title">Chapter 1</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">已完成</span>
+                        </div>
+                        <div class="paragraph-item current">
+                            <span class="paragraph-number">3</span>
+                            <span class="paragraph-title">Chapter 2</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">进行中</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">4</span>
+                            <span class="paragraph-title">Chapter 3</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">5</span>
+                            <span class="paragraph-title">Chapter 4</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">6</span>
+                            <span class="paragraph-title">Conclusion</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 未下载内容 -->
+                <div class="content-card">
+                    <div class="delete-action">删除</div>
+                    <div class="card-header">
+                        <h3 class="content-title">Another Article Example</h3>
+                        <button class="expand-btn">▼</button>
+                    </div>
+                    <div class="content-meta">
+                        <p>作者：Jane Smith</p>
+                        <p>预估总时长：45分钟</p>
+                    </div>
+                    <div class="content-status">
+                        <span class="progress-info">未读</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+
+                    <div class="paragraph-list">
+                        <h4>段落列表</h4>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">1</span>
+                            <span class="paragraph-title">Introduction</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">2</span>
+                            <span class="paragraph-title">Chapter 1</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">3</span>
+                            <span class="paragraph-title">Chapter 2</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">4</span>
+                            <span class="paragraph-title">Conclusion</span>
+                            <span class="paragraph-duration">5分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 已下载内容 -->
+                <div class="content-card">
+                    <div class="delete-action">删除</div>
+                    <div class="card-header">
+                        <h3 class="content-title">Advanced Reading Material</h3>
+                        <button class="expand-btn">▼</button>
+                    </div>
+                    <div class="content-meta">
+                        <p>作者：Robert Johnson</p>
+                        <p>预估总时长：90分钟</p>
+                    </div>
+                    <div class="content-status">
+                        <span class="progress-info">已读30%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+
+                    <div class="paragraph-list">
+                        <h4>段落列表</h4>
+                        <div class="paragraph-item completed">
+                            <span class="paragraph-number">1</span>
+                            <span class="paragraph-title">Introduction</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">已完成</span>
+                        </div>
+                        <div class="paragraph-item completed">
+                            <span class="paragraph-number">2</span>
+                            <span class="paragraph-title">Chapter 1</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">已完成</span>
+                        </div>
+                        <div class="paragraph-item completed">
+                            <span class="paragraph-number">3</span>
+                            <span class="paragraph-title">Chapter 2</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">已完成</span>
+                        </div>
+                        <div class="paragraph-item current">
+                            <span class="paragraph-number">4</span>
+                            <span class="paragraph-title">Chapter 3</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">进行中</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">5</span>
+                            <span class="paragraph-title">Chapter 4</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">6</span>
+                            <span class="paragraph-title">Chapter 5</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">7</span>
+                            <span class="paragraph-title">Chapter 6</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">8</span>
+                            <span class="paragraph-title">Chapter 7</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                        <div class="paragraph-item">
+                            <span class="paragraph-number">9</span>
+                            <span class="paragraph-title">Conclusion</span>
+                            <span class="paragraph-duration">10分钟</span>
+                            <span class="paragraph-status">未开始</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+
+    </div>
+
+    <script>
+        // 移动端交互
+        const mobileApp = document.querySelector('.mobile-app');
+        const backBtn = document.getElementById('back-btn');
+        const expandBtns = document.querySelectorAll('.expand-btn');
+
+        // 返回按钮点击事件
+        backBtn.addEventListener('click', () => {
+            window.location.href = '../home/index.html';
+        });
+
+        // 展开/折叠按钮点击事件
+        expandBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const contentCard = btn.closest('.content-card');
+                const paragraphList = contentCard.querySelector('.paragraph-list');
+                
+                // 切换段落列表的显示/隐藏状态
+                paragraphList.classList.toggle('active');
+                
+                // 旋转展开按钮图标
+                if (paragraphList.classList.contains('active')) {
+                    btn.textContent = '▲';
+                } else {
+                    btn.textContent = '▼';
+                }
+            });
+        });
+
+        // 内容卡片点击事件
+        mobileApp.addEventListener('click', (e) => {
+            const contentCard = e.target.closest('.content-card');
+            const expandBtn = e.target.closest('.expand-btn');
+            const deleteAction = e.target.closest('.delete-action');
+            const paragraphItem = e.target.closest('.paragraph-item');
+            
+            // 如果点击的是展开按钮，不跳转
+            if (expandBtn) {
+                return;
+            }
+            
+            // 如果点击的是删除操作
+            if (deleteAction) {
+                if (confirm('确定要删除此内容吗？')) {
+                    alert('内容已删除');
+                    // 实际项目中这里会触发删除逻辑
+                }
+                return;
+            }
+            
+            // 如果点击的是段落项，跳转到阅读练习页
+            if (paragraphItem) {
+                window.location.href = '../reading-practice/index.html';
+                return;
+            }
+            
+            // 如果点击的是内容卡片，跳转到阅读练习页
+            if (contentCard) {
+                window.location.href = '../reading-practice/index.html';
+            }
+        });
+
+        // 左滑删除功能
+        let startX, currentX;
+        let currentCard = null;
+        
+        mobileApp.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            currentCard = e.target.closest('.content-card');
+        });
+        
+        mobileApp.addEventListener('touchmove', (e) => {
+            if (!currentCard) return;
+            
+            currentX = e.touches[0].clientX;
+            const diffX = startX - currentX;
+            
+            // 只允许左滑，最多滑出100px
+            if (diffX > 0 && diffX <= 100) {
+                currentCard.style.transform = `translateX(-${diffX}px)`;
+            }
+        });
+        
+        mobileApp.addEventListener('touchend', (e) => {
+            if (!currentCard) return;
+            
+            const diffX = startX - currentX;
+            
+            // 如果左滑距离超过50px，显示删除按钮
+            if (diffX > 50) {
+                currentCard.classList.add('swipe-left');
+                currentCard.style.transform = 'translateX(0)';
+            } else {
+                // 否则恢复原位
+                currentCard.style.transform = 'translateX(0)';
+            }
+            
+            currentCard = null;
+        });
+
+        // 点击卡片其他区域关闭删除按钮
+        mobileApp.addEventListener('click', (e) => {
+            const contentCard = e.target.closest('.content-card');
+            const deleteAction = e.target.closest('.delete-action');
+            
+            // 关闭所有卡片的左滑状态
+            document.querySelectorAll('.content-card').forEach(card => {
+                if (card !== contentCard || !deleteAction) {
+                    card.classList.remove('swipe-left');
+                }
+            });
+        });
+
+        // 模拟下拉刷新
+        let startY;
+        const mainContent = document.querySelector('.mobile-main');
+
+        if (mainContent) {
+            mainContent.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+            });
+
+            mainContent.addEventListener('touchmove', (e) => {
+                const currentY = e.touches[0].clientY;
+                const scrollTop = mainContent.scrollTop;
+
+                if (scrollTop <= 0 && currentY > startY) {
+                    // 下拉刷新逻辑
+                    console.log('下拉刷新...');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

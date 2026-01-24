@@ -278,6 +278,7 @@
             color: var(--text-primary);
             border: 1px solid var(--border-color);
             padding: var(--spacing-3) var(--spacing-5);
+            min-width: 80px;
         }
 
         .btn-secondary:hover {
@@ -312,11 +313,13 @@
             justify-content: space-between;
             align-items: center;
             transition: all var(--transition-base);
+            cursor: pointer;
         }
 
         .recent-item:hover {
             box-shadow: var(--shadow-md);
             transform: translateX(4px);
+            background-color: var(--background-light);
         }
 
         .recent-content h4 {
@@ -391,21 +394,23 @@
 
         <!-- 主内容区域 -->
         <main class="mobile-main">
-            <!-- 练习统计卡片 -->
-            <section class="stats-card">
-                <div class="stats-header">
+            <!-- 练习统计 -->
+            <section>
+                <div class="section-header">
                     <h2>练习统计</h2>
-                    <span class="stats-icon">📊</span>
+                    <a href="../progress-record/index.html" class="see-all">更多</a>
                 </div>
-                <div class="stats-content">
-                    <div class="stat-item">
-                        <div class="stat-value" id="total-days">15</div>
-                        <div class="stat-label">累计练习天数</div>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="today-status">0/1</div>
-                        <div class="stat-label">今日练习</div>
+                <div class="stats-card">
+                    <div class="stats-content">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-days">15</div>
+                            <div class="stat-label">累计练习天数</div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="today-status">0/1</div>
+                            <div class="stat-label">今日练习</div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -414,14 +419,13 @@
             <section class="recommendation-section">
                 <div class="section-header">
                     <h2>今日推荐</h2>
-                    <a href="#" class="see-all">查看全部</a>
+                    <a href="../content-library/index.html" class="see-all">查看全部</a>
                 </div>
                 
                 <div class="recommendation-card">
                     <h3>Sample Article Title</h3>
                     <div class="article-meta">
                         <span class="duration">⏱️ 12 分钟</span>
-                        <span class="difficulty">📚 中等</span>
                     </div>
                     <p class="article-preview">This article is recommended for you based on your reading history and preferences...</p>
                     <button class="btn btn-primary btn-full">开始练习</button>
@@ -432,7 +436,7 @@
             <section class="recent-section">
                 <div class="section-header">
                     <h2>最近阅读</h2>
-                    <a href="#" class="see-all">查看全部</a>
+                    <a href="../content-library/index.html" class="see-all">查看全部</a>
                 </div>
                 
                 <div class="recent-list">
@@ -445,7 +449,6 @@
                                 <span class="recent-progress">70%</span>
                             </div>
                         </div>
-                        <button class="btn btn-secondary">继续</button>
                     </div>
                     
                     <!-- 最近阅读项2 -->
@@ -457,7 +460,6 @@
                                 <span class="recent-progress">30%</span>
                             </div>
                         </div>
-                        <button class="btn btn-secondary">继续</button>
                     </div>
                     
                     <!-- 最近阅读项3 -->
@@ -469,7 +471,6 @@
                                 <span class="recent-progress">100%</span>
                             </div>
                         </div>
-                        <button class="btn btn-secondary">重新练习</button>
                     </div>
                 </div>
             </section>
@@ -477,19 +478,19 @@
 
         <!-- 底部导航栏 -->
         <footer class="mobile-footer">
-            <a href="#" class="nav-item active">
+            <a href="index.html" class="nav-item active">
                 <span class="nav-icon">🏠</span>
                 <span class="nav-label">首页</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../content-library/index.html" class="nav-item">
                 <span class="nav-icon">📚</span>
                 <span class="nav-label">内容库</span>
             </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">📝</span>
+            <a href="../reading-practice/index.html" class="nav-item">
+                <span class="nav-icon">�</span>
                 <span class="nav-label">练习</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="../progress-record/index.html" class="nav-item">
                 <span class="nav-icon">📊</span>
                 <span class="nav-label">记录</span>
             </a>
@@ -502,38 +503,23 @@
 
         // 开始练习按钮点击
         mobileApp.addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON') {
-                const button = e.target;
-                
-                if (button.textContent === '开始练习') {
-                    alert('开始朗读练习');
-                    // 跳转到朗读练习页
-                    // window.location.href = '/reading-practice';
-                } else if (button.textContent === '继续') {
-                    alert('继续上次练习');
-                    // 跳转到朗读练习页并恢复进度
-                } else if (button.textContent === '重新练习') {
-                    alert('重新开始练习');
-                    // 跳转到朗读练习页从头开始
-                }
+            if (e.target.tagName === 'BUTTON' && e.target.textContent === '开始练习') {
+                // 跳转到朗读练习页
+                window.location.href = '../reading-practice/index.html';
             }
         });
 
-        // 底部导航栏交互
-        const navItems = mobileApp.querySelectorAll('.nav-item');
-
-        navItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                // 移除所有active类
-                navItems.forEach(nav => nav.classList.remove('active'));
-                // 添加active类到当前项
-                item.classList.add('active');
-                // 根据导航项跳转到不同页面
-                const navLabel = item.querySelector('.nav-label').textContent;
-                alert(`跳转到${navLabel}页面`);
-            });
+        // 最近阅读卡片点击
+        mobileApp.addEventListener('click', (e) => {
+            const recentItem = e.target.closest('.recent-item');
+            if (recentItem) {
+                // 跳转到朗读练习页
+                window.location.href = '../reading-practice/index.html';
+            }
         });
+
+        // 底部导航栏交互 - 现在使用实际链接，无需额外处理
+        // 导航项的激活状态会由服务端或前端路由处理
     </script>
 </body>
 </html>
