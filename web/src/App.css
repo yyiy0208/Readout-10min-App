@@ -1,27 +1,860 @@
-#components-layout-demo-top .logo {
-  float: left;
-  width: 120px;
-  height: 31px;
-  margin: 16px 24px 16px 0;
-  background: rgba(255, 255, 255, 0.3);
-}
-.site-layout-content {
-  min-height: 280px;
-  padding: 24px;
-  background: #fff;
-}
-#components-layout-demo-top .logo {
-  float: left;
-  width: 120px;
-  height: 31px;
-  margin: 16px 24px 16px 0;
-  background: rgba(255, 255, 255, 0.3);
-}
-.ant-row-rtl #components-layout-demo-top .logo {
-  float: right;
-  margin: 16px 0 16px 24px;
+/* 新配色方案 - 用户提供的配色 */
+:root {
+  /* 主色调 - 基于用户提供的配色方案 */
+  --primary-color: #ff8ba7; /* 强调色 - 主色调 */
+  --primary-light: #ffc6c7; /* 次要色 - 主色调变体 */
+  --secondary-color: #c3f0ca; /* 第三色 - 辅助色 */
+  --accent-color: #ff8ba7; /* 强调色 */
+  --accent-2: #ffc6c7; /* 次要色 */
+  --accent-3: #c3f0ca; /* 第三色 */
+  
+  /* 功能色 */
+  --success-color: #22c55e; /* 成功色 */
+  --error-color: #ef4444; /* 错误色 */
+  --warning-color: #f59e0b; /* 警告色 */
+  --info-color: #3b82f6; /* 信息色 */
+  
+  /* 背景色 - 基于用户提供的配色方案 */
+  --background-color: #fffffe; /* 主背景色 */
+  --background-alt: #faeee7; /* 卡片背景色 */
+  --background-light: #ffc6c7; /* 辅助背景色 */
+  
+  /* 文字色 - 基于用户提供的配色方案 */
+  --text-primary: #33272a; /* 主文字色 - 标题、卡片标题 */
+  --text-secondary: #594a4e; /* 次要文字色 - 副标题、卡片段落 */
+  --text-light: #594a4e; /* 辅助文字色 */
+  --text-muted: #cbd5e1; /* 禁用文字色 */
+  
+  /* 边框色 */
+  --border-color: #ffc6c7; /* 边框色 */
+  --border-light: #ffc6c7; /* 浅边框色 */
+  --border-dark: #594a4e; /* 深边框色 */
+  
+  /* 阴影效果 - 柔和自然 */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* 字体 - 现代清晰 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  
+  /* 行高和字重 */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* 间距 - 充足的留白 */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  
+  /* 圆角 - 柔和的弧度 */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+  --border-radius-full: 9999px;
+  
+  /* 过渡效果 */
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
 }
 
+/* 基础样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 平滑滚动 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Happy Hues 风格基础样式 */
+body {
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 应用容器 */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 顶部导航栏 - Happy Hues 风格 */
+.top-nav {
+  background-color: var(--primary-color);
+  color: white;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-8);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Logo设计 */
+.logo {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  letter-spacing: -0.02em;
+}
+
+/* 导航链接 */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-3) var(--spacing-5);
+  border-radius: var(--border-radius-full);
+  transition: all var(--transition-base);
+  font-size: var(--font-size-sm);
+  opacity: 0.8;
+  position: relative;
+}
+
+/* 导航链接悬停效果 */
+.nav-links a:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 激活导航项 */
+.nav-links a.active {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 下拉菜单样式 */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  min-width: 160px;
+  padding: var(--spacing-2) 0;
+  margin-top: var(--spacing-2);
+  z-index: 1000;
+  display: none;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  display: block;
+  padding: var(--spacing-3) var(--spacing-6);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-base);
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background-color: var(--background-light);
+}
+
+/* 主内容区域 */
+.main-content {
+  flex: 1;
+  padding: var(--spacing-8);
+}
+
+/* 布局样式 */
 .layout {
   min-height: 100vh;
+}
+
+.site-layout-content {
+  background: var(--background-color);
+  padding: var(--spacing-8);
+  margin: var(--spacing-8) 0;
+  border-radius: var(--border-radius-lg);
+}
+
+/* 高级搜索框 */
+.search-box {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: var(--spacing-2);
+  border-radius: var(--border-radius-full);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-base);
+}
+
+.search-box:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 139, 167, 0.1);
+}
+
+.search-box input {
+  padding: var(--spacing-3) var(--spacing-4);
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  width: 240px;
+}
+
+.search-box input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-btn {
+  padding: var(--spacing-3) var(--spacing-5);
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--border-radius-full);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-base);
+}
+
+.search-btn:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* 表格容器 */
+.table-container {
+  overflow-x: auto;
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-6);
+  border: 1px solid var(--border-color);
+}
+
+/* 表格样式 - 现代化设计 */
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+  background-color: var(--background-alt);
+}
+
+/* 表格标题 */
+.file-table th {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--spacing-4) var(--spacing-6);
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: none;
+}
+
+/* 表格数据行 */
+.file-table td {
+  padding: var(--spacing-5) var(--spacing-6);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  border-bottom: none;
+  transition: all var(--transition-fast);
+}
+
+/* 表格行悬停效果 */
+.file-table tbody tr {
+  transition: all var(--transition-base);
+  cursor: pointer;
+  border-bottom: none;
+}
+
+.file-table tbody tr:hover {
+  background: rgba(255, 139, 167, 0.03);
+}
+
+/* 表格行选中效果 */
+.file-table tbody tr:nth-child(even) {
+  background: var(--background-light);
+}
+
+/* 文件图标 */
+.file-icon {
+  margin-right: var(--spacing-3);
+  font-size: var(--font-size-lg);
+  vertical-align: middle;
+}
+
+/* 文件名样式 */
+.file-table tbody tr td:first-child {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+}
+
+/* 分页样式 - 现代化设计 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+  padding: var(--spacing-4);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--border-radius-full);
+  border: 1px solid var(--border-light);
+}
+
+/* 分页信息 */
+.page-info {
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+/* 分页按钮 */
+.pagination .btn {
+  padding: var(--spacing-3) var(--spacing-4);
+  min-width: 40px;
+  font-size: var(--font-size-xs);
+}
+
+/* 高级页脚 */
+.footer {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(120%);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  border-top: 1px solid var(--border-light);
+  padding: var(--spacing-8);
+  text-align: center;
+  color: var(--text-light);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-relaxed);
+  position: relative;
+  z-index: 1;
+}
+
+.footer p {
+  margin: 0;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 页脚装饰 */
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+}
+
+/* 标题样式 */
+h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-8);
+}
+
+/* Happy Hues 风格卡片容器 */
+.card-container {
+  background-color: var(--background-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  overflow: hidden;
+}
+
+/* 卡片悬停效果 */
+.card-container:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* 上传区域样式 */
+.upload-section {
+  margin-bottom: var(--spacing-8);
+}
+
+.upload-section .card-container {
+  padding: var(--spacing-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  background-color: var(--background-alt);
+}
+
+/* 上传容器 */
+.upload-container {
+  text-align: center;
+  background-color: transparent;
+  padding: var(--spacing-4);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* 上传容器悬停效果 */
+.upload-container:hover {
+  box-shadow: none;
+  background-color: transparent;
+}
+
+/* 拖拽激活状态 */
+.upload-container.drag-active {
+  border-color: var(--primary-color);
+  background-color: rgba(255, 139, 167, 0.1);
+  box-shadow: var(--shadow-md);
+}
+
+/* 上传标题和描述 */
+.upload-container h2 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-2);
+  color: var(--text-primary);
+}
+
+.upload-container p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.upload-hint {
+  font-size: var(--font-size-xs) !important;
+  color: var(--text-secondary) !important;
+  font-weight: var(--font-weight-normal) !important;
+  margin-bottom: var(--spacing-4) !important;
+}
+
+/* 上传图标 */
+.upload-icon {
+  font-size: 32px;
+  margin-bottom: var(--spacing-2);
+  color: var(--primary-color);
+}
+
+/* Ant Design 风格上传区域 - 调整大小和宽度 */
+.ant-upload-drag {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-4); /* 减少内边距，降低高度 */
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background-color: var(--background-alt);
+  width: 100%; /* 与下方列表宽度一致 */
+  max-width: none; /* 移除最大宽度限制 */
+  height: auto; /* 自动高度，根据内容调整 */
+  min-height: 80px; /* 设置最小高度，确保可用性 */
+}
+
+.ant-upload-drag:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(255, 139, 167, 0.1);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.ant-upload-drag-container {
+  text-align: center;
+}
+
+.ant-upload-drag-container .upload-icon {
+  font-size: 32px; /* 减小图标大小 */
+  margin-bottom: var(--spacing-2); /* 减少间距 */
+  color: var(--primary-color);
+}
+
+.ant-upload-drag-container p {
+  margin-bottom: var(--spacing-1); /* 减少间距 */
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm); /* 减小字体大小 */
+}
+
+.ant-upload-hint {
+  font-size: var(--font-size-xs) !important; /* 减小提示文字大小 */
+  color: var(--text-secondary) !important;
+  font-weight: var(--font-weight-normal) !important;
+  margin-bottom: 0 !important;
+}
+
+/* 上传按钮组 */
+.upload-buttons {
+  display: flex;
+  gap: var(--spacing-4);
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+  margin-top: var(--spacing-4);
+}
+
+/* Happy Hues 风格按钮基础样式 */
+.btn {
+  padding: var(--spacing-4) var(--spacing-6);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  font-family: var(--font-family);
+}
+
+/* 主按钮 */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 次要按钮 */
+.btn-secondary {
+  background-color: var(--background-light);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--border-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 危险按钮 */
+.btn-danger {
+  background-color: #ff8ba7;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #ffc6c7;
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 小号按钮 */
+.btn-sm {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-xs);
+}
+
+/* 操作按钮容器 */
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+/* 表格数据行对齐 */
+.file-table td {
+  vertical-align: middle;
+}
+
+/* 文件名单元格对齐 */
+.file-table tbody tr td:first-child {
+  vertical-align: middle;
+  align-items: center;
+}
+
+/* 上传进度样式 - Ant Design风格 */
+.upload-progress {
+  margin-top: var(--spacing-6);
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: var(--spacing-4);
+  background: transparent;
+  border-radius: 0;
+  backdrop-filter: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ant Design风格进度条 */
+.progress-bar {
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-2);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: progress-shine 1.5s infinite;
+}
+
+@keyframes progress-shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* 进度文本 */
+.progress-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-align: center;
+  font-weight: var(--font-weight-medium);
+  margin-top: var(--spacing-2);
+}
+
+/* 文件列表样式 */
+.file-list-section {
+  margin-bottom: var(--spacing-8);
+}
+
+.file-list-section .card-container {
+  padding: var(--spacing-8);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  background-color: var(--background-alt);
+}
+
+/* 表格容器 */
+.table-container {
+  overflow-x: auto;
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-6);
+  border: none;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* 区域标题 */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-6);
+}
+
+.section-header h2 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+/* 空文件列表 */
+.empty-file-list {
+  text-align: center;
+  padding: var(--spacing-8);
+  color: var(--text-secondary);
+}
+
+/* 文件列表 */
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* 文件项 */
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-4);
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-base);
+}
+
+.file-item:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+/* 文件信息 */
+.file-info {
+  flex: 1;
+}
+
+/* 文件名 */
+.file-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-1);
+}
+
+/* 文件元数据 */
+.file-meta {
+  display: flex;
+  gap: var(--spacing-4);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+/* 文件状态 */
+.file-status {
+  padding: 2px 8px;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.file-status.completed {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--success-color);
+}
+
+.file-status.uploading {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--info-color);
+}
+
+.file-status.failed {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--error-color);
+}
+
+/* 文件操作 */
+.file-actions {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+/* 文件操作按钮 */
+.file-action-btn {
+  font-size: var(--font-size-xs) !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .site-layout-content {
+    padding: var(--spacing-4);
+    margin: var(--spacing-4) 0;
+  }
+
+  .upload-container {
+    padding: var(--spacing-3);
+  }
+
+  .upload-container h2 {
+    font-size: var(--font-size-base);
+  }
+
+  .file-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+  }
+
+  .file-actions {
+    align-self: flex-end;
+  }
+
+  .file-meta {
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
 }

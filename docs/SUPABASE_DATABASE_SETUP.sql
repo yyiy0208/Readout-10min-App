@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS content (
     difficulty TEXT DEFAULT 'medium', -- easy, medium, hard
     language TEXT DEFAULT 'en',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_by TEXT not NULL
 );
 
 -- 创建 paragraphs 表：存储拆分后的段落
