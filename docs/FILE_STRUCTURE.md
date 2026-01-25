@@ -112,6 +112,7 @@ web/
 页面级组件，每个页面对应一个路由。
 
 - `FileManagementPage.tsx`：文件管理页面，包含文件上传和文件列表功能
+- `FileProcessingPage.tsx`：文件处理页面，包含段落拆分设置和分段结果展示
 
 ### 4. services/
 业务逻辑服务，处理数据请求和业务规则。

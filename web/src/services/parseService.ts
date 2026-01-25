@@ -149,7 +149,86 @@ class ParseService {
     }
   }
   
-  // 拆分段落
+  // 计算词数
+  private countWords(text: string): number {
+    // 简单的英文词数统计，实际应用中可能需要更复杂的算法
+    // 处理中文和英文混合的情况
+    if (/[\u4e00-\u9fa5]/.test(text)) {
+      // 包含中文，使用字符计数（中文每个字算1词）
+      return text.replace(/\s+/g, '').length;
+    } else {
+      // 英文，按空格拆分
+      return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+    }
+  }
+  
+  // 估算阅读时长（分钟）
+  private estimateDuration(wordCount: number, text: string): number {
+    // 假设平均阅读速度：
+    // 中文：300字/分钟
+    // 英文：200词/分钟
+    const chineseRegex = /[\u4e00-\u9fa5]/;
+    const readingSpeed = chineseRegex.test(text) ? 300 : 200;
+    return wordCount / readingSpeed;
+  }
+  
+  // 按目标时长拆分段落
+  public splitParagraphsByDuration(content: string, targetDuration: number = 10): Array<{text: string, wordCount: number, estimatedDuration: number}> {
+    // 1. 首先按空行拆分原始段落
+    const originalParagraphs = content
+      .replace(/\r\n/g, '\n')
+      .split(/\n\s*\n/)
+      .filter(para => para.trim().length > 0)
+      .map(para => para.trim());
+    
+    // 2. 统计总词数
+    const totalWords = originalParagraphs.reduce((sum, para) => sum + this.countWords(para), 0);
+    
+    // 3. 计算每个段落的阅读速度
+    const chineseRegex = /[\u4e00-\u9fa5]/;
+    const contentHasChinese = chineseRegex.test(content);
+    const readingSpeed = contentHasChinese ? 300 : 200;
+    
+    // 4. 计算总估算时长
+    const estimatedTotalDuration = totalWords / readingSpeed;
+    
+    // 5. 计算需要的段落数量
+    const requiredParagraphs = Math.ceil(estimatedTotalDuration / targetDuration);
+    
+    // 6. 智能合并或拆分段落
+    let result: Array<{text: string, wordCount: number, estimatedDuration: number}> = [];
+    
+    if (originalParagraphs.length <= requiredParagraphs) {
+      // 原始段落数量小于等于需要的段落数量，直接返回
+      result = originalParagraphs.map(para => {
+        const wordCount = this.countWords(para);
+        return {
+          text: para,
+          wordCount,
+          estimatedDuration: this.estimateDuration(wordCount, para)
+        };
+      });
+    } else {
+      // 需要合并段落
+      const paragraphsPerGroup = Math.ceil(originalParagraphs.length / requiredParagraphs);
+      
+      for (let i = 0; i < originalParagraphs.length; i += paragraphsPerGroup) {
+        const group = originalParagraphs.slice(i, i + paragraphsPerGroup);
+        const combinedText = group.join('\n\n');
+        const wordCount = this.countWords(combinedText);
+        
+        result.push({
+          text: combinedText,
+          wordCount,
+          estimatedDuration: this.estimateDuration(wordCount, combinedText)
+        });
+      }
+    }
+    
+    return result;
+  }
+  
+  // 拆分段落（原始方法，保持兼容性）
   private splitParagraphs(content: string): string[] {
     // 1. 移除多余的空白字符
     const cleanedContent = content

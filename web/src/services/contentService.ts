@@ -134,6 +134,100 @@ class ContentService {
     }
   }
   
+  // 更新段落拆分结果
+  async updateParagraphs(
+    contentId: string,
+    paragraphs: Array<{text: string, wordCount: number, estimatedDuration: number}>
+  ): Promise<{ success: boolean; error: Error | null }> {
+    try {
+      // 1. 删除现有段落
+      const { error: deleteError } = await supabase
+        .from('paragraphs')
+        .delete()
+        .eq('content_id', contentId);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      // 2. 插入新段落
+      if (paragraphs.length > 0) {
+        const paragraphData = paragraphs.map((para, index) => ({
+          content_id: contentId,
+          paragraph_number: index + 1,
+          text: para.text,
+          word_count: para.wordCount,
+          estimated_duration: Math.round(para.estimatedDuration * 60) // 转换为秒
+        }));
+
+        const { error: insertError } = await supabase
+          .from('paragraphs')
+          .insert(paragraphData);
+
+        if (insertError) {
+          throw insertError;
+        }
+      }
+
+      // 3. 更新content表中的统计信息
+      const totalParagraphs = paragraphs.length;
+      const totalWords = paragraphs.reduce((sum, para) => sum + para.wordCount, 0);
+      const estimatedDuration = Math.round(paragraphs.reduce((sum, para) => sum + para.estimatedDuration, 0) * 60);
+
+      const { error: updateError } = await supabase
+        .from('content')
+        .update({
+          total_paragraphs: totalParagraphs,
+          total_words: totalWords,
+          estimated_duration: estimatedDuration
+        })
+        .eq('id', contentId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      return {
+        success: true,
+        error: null
+      };
+    } catch (error) {
+      console.error('更新段落失败:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error : new Error('更新段落失败')
+      };
+    }
+  }
+  
+  // 获取历史分段结果
+  async getParagraphsByContentId(contentId: string): Promise<Array<{
+    text: string;
+    wordCount: number;
+    estimatedDuration: number;
+  }>> {
+    try {
+      const { data, error } = await supabase
+        .from('paragraphs')
+        .select('text, word_count, estimated_duration')
+        .eq('content_id', contentId)
+        .order('paragraph_number', { ascending: true });
+      
+      if (error) {
+        throw error;
+      }
+      
+      return (data || []).map(paragraph => ({
+        text: paragraph.text,
+        wordCount: paragraph.word_count,
+        estimatedDuration: paragraph.estimated_duration / 60 // 转换为分钟
+      }));
+    } catch (error) {
+      console.error('获取历史分段结果失败:', error);
+      return [];
+    }
+  }
+  
   // 计算段落统计信息
   calculateParagraphStats(paragraphs: string[]): {
     totalParagraphs: number;

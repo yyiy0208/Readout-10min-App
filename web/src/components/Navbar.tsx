@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const location = useLocation();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -29,8 +31,18 @@ const Navbar: React.FC = () => {
     <header className="top-nav">
       <div className="logo">Readout-10min</div>
       <nav className="nav-links">
-        <a href="#" className="active">文件管理</a>
-        <a href="#">文件处理</a>
+        <Link 
+          to="/" 
+          className={location.pathname === '/' ? 'active' : ''}
+        >
+          文件管理
+        </Link>
+        <Link 
+          to="/file-processing" 
+          className={location.pathname === '/file-processing' ? 'active' : ''}
+        >
+          文件处理
+        </Link>
         <div className="dropdown">
           <a href="#" className="dropdown-toggle" onClick={toggleDropdown}>
             账号管理

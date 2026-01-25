@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Spin } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { FileItem } from '../types';
 
 interface FileListProps {
@@ -10,6 +11,7 @@ interface FileListProps {
 
 const FileList: React.FC<FileListProps> = ({ files, onDelete, loading }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   // 过滤文件
   const filteredFiles = files.filter(file => 
@@ -131,6 +133,7 @@ const FileList: React.FC<FileListProps> = ({ files, onDelete, loading }) => {
                             e.currentTarget.style.transform = 'translateY(0)';
                             e.currentTarget.style.boxShadow = 'none';
                           }}
+                          onClick={() => navigate('/file-processing', { state: { file } })}
                         >
                           分段
                         </button>
