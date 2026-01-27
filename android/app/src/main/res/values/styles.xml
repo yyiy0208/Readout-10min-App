@@ -1,0 +1,46 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Readout10min" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/purple_80</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/secondary_color</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Background color -->
+        <item name="android:colorBackground">@color/background_color</item>
+        <item name="colorOnBackground">@color/on_background</item>
+
+        <!-- Surface color -->
+        <item name="colorSurface">@color/surface_color</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+
+        <!-- Error color -->
+        <item name="colorError">@color/error_color</item>
+        <item name="colorOnError">@color/white</item>
+
+        <!-- Typography -->
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Readout10min.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Readout10min.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Readout10min.HeadlineSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Readout10min.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Readout10min.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Readout10min.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Readout10min.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Readout10min.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Readout10min.BodySmall</item>
+    </style>
+
+    <!-- Text appearances -->
+    <style name="TextAppearance.Readout10min.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge" />
+    <style name="TextAppearance.Readout10min.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium" />
+    <style name="TextAppearance.Readout10min.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall" />
+    <style name="TextAppearance.Readout10min.TitleLarge" parent="TextAppearance.Material3.TitleLarge" />
+    <style name="TextAppearance.Readout10min.TitleMedium" parent="TextAppearance.Material3.TitleMedium" />
+    <style name="TextAppearance.Readout10min.TitleSmall" parent="TextAppearance.Material3.TitleSmall" />
+    <style name="TextAppearance.Readout10min.BodyLarge" parent="TextAppearance.Material3.BodyLarge" />
+    <style name="TextAppearance.Readout10min.BodyMedium" parent="TextAppearance.Material3.BodyMedium" />
+    <style name="TextAppearance.Readout10min.BodySmall" parent="TextAppearance.Material3.BodySmall" />
+</resources>

@@ -92,13 +92,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
         onDrop={handleDrop}
         onClick={handleClickUpload}
         style={{
-          border: `2px dashed ${isDragging ? '#ff8ba7' : '#ffc6c7'}`,
+          border: `2px dashed ${isDragging ? 'var(--md-sys-color-primary)' : 'var(--md-sys-color-outline-variant)'}`,
           borderRadius: '0.75rem',
           padding: '16px',
           textAlign: 'center',
           cursor: 'pointer',
           transition: 'all 0.25s',
-          backgroundColor: '#faeee7',
+          backgroundColor: 'var(--md-sys-color-surface-container-low)',
           width: '100%',
           maxWidth: 'none',
           height: 'auto',
@@ -106,15 +106,15 @@ const FileUpload: React.FC<FileUploadProps> = ({
         }}
       >
         <div className="ant-upload-drag-container">
-          <div className="upload-icon" style={{ fontSize: '32px', marginBottom: '8px', color: '#ff8ba7' }}>📁</div>
-          <p style={{ fontSize: '14px', marginBottom: '4px', color: '#33272a', fontWeight: '500' }}>Click or drag file to this area to upload</p>
-          <p className="ant-upload-hint" style={{ fontSize: '12px', color: '#594a4e', fontWeight: 'normal', marginBottom: '0' }}>Support for a single or bulk upload.</p>
+          <div className="upload-icon" style={{ fontSize: '32px', marginBottom: '8px', color: 'var(--md-sys-color-primary)' }}>📁</div>
+          <p style={{ fontSize: '14px', marginBottom: '4px', color: 'var(--md-sys-color-on-surface)', fontWeight: '500' }}>Click or drag file to this area to upload</p>
+          <p className="ant-upload-hint" style={{ fontSize: '12px', color: 'var(--md-sys-color-on-surface-variant)', fontWeight: 'normal', marginBottom: '0' }}>Support for a single or bulk upload.</p>
         </div>
       </div>
 
       {uploading && (
-        <div className="upload-progress" style={{ marginTop: '24px', width: '100%', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto', padding: '16px', background: 'rgba(255, 255, 255, 0.5)', borderRadius: '0.5rem', backdropFilter: 'blur(10px)' }}>
-          <div className="progress-info" style={{ marginBottom: '12px', fontSize: '14px', color: '#33272a', fontWeight: '500', textAlign: 'center' }}>
+        <div className="upload-progress" style={{ marginTop: '24px', width: '100%', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto', padding: '16px', background: 'var(--md-sys-color-surface-container)', borderRadius: '0.5rem', backdropFilter: 'blur(10px)' }}>
+          <div className="progress-info" style={{ marginBottom: '12px', fontSize: '14px', color: 'var(--md-sys-color-on-surface)', fontWeight: '500', textAlign: 'center' }}>
             正在处理: {currentFileName}
           </div>
           
@@ -122,14 +122,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
           <div className="progress-steps" style={{ marginBottom: '16px' }}>
             {/* 步骤指示器 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#594a4e' }}>
-                <div style={{ width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: uploadStatus === 'completed' || uploadStatus === 'uploading' || uploadStatus === 'parsing' ? '#ff8ba7' : '#cbd5e1', color: 'white', fontSize: '10px', fontWeight: 'bold' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--md-sys-color-on-surface-variant)' }}>
+                <div style={{ width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: uploadStatus === 'completed' || uploadStatus === 'uploading' || uploadStatus === 'parsing' ? 'var(--md-sys-color-primary)' : 'var(--md-sys-color-surface-variant)', color: 'var(--md-sys-color-on-primary)', fontSize: '10px', fontWeight: 'bold' }}>
                   ✓
                 </div>
                 <span>解析中</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#594a4e' }}>
-                <div style={{ width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: uploadStatus === 'completed' || uploadStatus === 'uploading' ? '#ff8ba7' : '#cbd5e1', color: 'white', fontSize: '10px', fontWeight: 'bold' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--md-sys-color-on-surface-variant)' }}>
+                <div style={{ width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: uploadStatus === 'completed' || uploadStatus === 'uploading' ? 'var(--md-sys-color-primary)' : 'var(--md-sys-color-surface-variant)', color: 'var(--md-sys-color-on-primary)', fontSize: '10px', fontWeight: 'bold' }}>
                   {uploadStatus === 'completed' ? '✓' : uploadStatus === 'uploading' ? '2' : '2'}
                 </div>
                 <span>上传中</span>
@@ -137,16 +137,16 @@ const FileUpload: React.FC<FileUploadProps> = ({
             </div>
             
             {/* 进度条 */}
-            <div className="progress-bar" style={{ height: '6px', background: 'rgba(0, 0, 0, 0.08)', borderRadius: '9999px', overflow: 'hidden', marginBottom: '8px', position: 'relative' }}>
+            <div className="progress-bar" style={{ height: '6px', background: 'var(--md-sys-color-surface-variant)', borderRadius: '9999px', overflow: 'hidden', marginBottom: '8px', position: 'relative' }}>
               <div 
                 className="progress-fill"
                 style={{
                   height: '100%',
-                  background: 'linear-gradient(90deg, #ff8ba7, #ffc6c7)',
+                  background: 'linear-gradient(90deg, var(--md-sys-color-primary), var(--md-sys-color-secondary))',
                   borderRadius: '9999px',
                   transition: 'width 0.3s ease-in-out',
                   width: `${uploadProgress}%`,
-                  boxShadow: '0 0 10px rgba(255, 139, 167, 0.3)',
+                  boxShadow: '0 0 10px rgba(104, 84, 141, 0.3)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}
@@ -165,7 +165,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             </div>
           </div>
           
-          <div className="progress-text" style={{ textAlign: 'center', fontSize: '14px', color: '#594a4e', fontWeight: '500' }}>
+          <div className="progress-text" style={{ textAlign: 'center', fontSize: '14px', color: 'var(--md-sys-color-on-surface-variant)', fontWeight: '500' }}>
             {getStatusText()}
           </div>
         </div>

@@ -1,85 +1,34 @@
 /* 新配色方案 - 用户提供的配色 */
 :root {
-  /* 主色调 - Material Design 3 风格 */
-  --primary-color: rgb(104 84 141); /* 主要颜色 */
-  --primary-light: rgb(211 187 253); /* 浅主要颜色 */
-  --secondary-color: rgb(99 91 112); /* 次要颜色 */
-  --accent-color: rgb(127 82 93); /* 强调色 */
-  --accent-2: rgb(234 222 247); /* 次要颜色容器 */
-  --accent-3: rgb(255 217 224); /* 强调色容器 */
+  /* 主色调 - 基于用户提供的配色方案 */
+  --primary-color: #ff8ba7; /* 强调色 - 主色调 */
+  --primary-light: #ffc6c7; /* 次要色 - 主色调变体 */
+  --secondary-color: #c3f0ca; /* 第三色 - 辅助色 */
+  --accent-color: #ff8ba7; /* 强调色 */
+  --accent-2: #ffc6c7; /* 次要色 */
+  --accent-3: #c3f0ca; /* 第三色 */
   
   /* 功能色 */
-  --success-color: #4CAF50; /* 成功色 */
-  --error-color: rgb(186 26 26); /* 错误色 */
+  --success-color: #22c55e; /* 成功色 */
+  --error-color: #ef4444; /* 错误色 */
   --warning-color: #f59e0b; /* 警告色 */
   --info-color: #3b82f6; /* 信息色 */
   
-  /* 背景色 - Material Design 3 风格 */
-  --background-color: rgb(254 247 255); /* 主背景色 */
-  --background-alt: rgb(242 236 244); /* 卡片背景色 */
-  --background-light: rgb(231 224 235); /* 辅助背景色 */
+  /* 背景色 - 基于用户提供的配色方案 */
+  --background-color: #fffffe; /* 主背景色 */
+  --background-alt: #faeee7; /* 卡片背景色 */
+  --background-light: #ffc6c7; /* 辅助背景色 */
   
-  /* 文字色 - Material Design 3 风格 */
-  --text-primary: rgb(29 27 32); /* 主文字色 - 标题、卡片标题 */
-  --text-secondary: rgb(73 69 78); /* 次要文字色 - 副标题、卡片段落 */
-  --text-light: rgb(122 117 127); /* 辅助文字色 */
-  --text-muted: rgb(203 196 207); /* 禁用文字色 */
+  /* 文字色 - 基于用户提供的配色方案 */
+  --text-primary: #33272a; /* 主文字色 - 标题、卡片标题 */
+  --text-secondary: #594a4e; /* 次要文字色 - 副标题、卡片段落 */
+  --text-light: #594a4e; /* 辅助文字色 */
+  --text-muted: #cbd5e1; /* 禁用文字色 */
   
   /* 边框色 */
-  --border-color: rgb(203 196 207); /* 边框色 */
-  --border-light: rgb(203 196 207); /* 浅边框色 */
-  --border-dark: rgb(73 69 78); /* 深边框色 */
-  
-  /* Material Design 3 系统颜色 */
-  --md-sys-color-primary: rgb(104 84 141); 
-  --md-sys-color-surface-tint: rgb(104 84 141); 
-  --md-sys-color-on-primary: rgb(255 255 255); 
-  --md-sys-color-primary-container: rgb(235 220 255); 
-  --md-sys-color-on-primary-container: rgb(80 60 116); 
-  --md-sys-color-secondary: rgb(99 91 112); 
-  --md-sys-color-on-secondary: rgb(255 255 255); 
-  --md-sys-color-secondary-container: rgb(234 222 247); 
-  --md-sys-color-on-secondary-container: rgb(75 67 88); 
-  --md-sys-color-tertiary: rgb(127 82 93); 
-  --md-sys-color-on-tertiary: rgb(255 255 255); 
-  --md-sys-color-tertiary-container: rgb(255 217 224); 
-  --md-sys-color-on-tertiary-container: rgb(100 59 70); 
-  --md-sys-color-error: rgb(186 26 26); 
-  --md-sys-color-on-error: rgb(255 255 255); 
-  --md-sys-color-error-container: rgb(255 218 214); 
-  --md-sys-color-on-error-container: rgb(147 0 10); 
-  --md-sys-color-background: rgb(254 247 255); 
-  --md-sys-color-on-background: rgb(29 27 32); 
-  --md-sys-color-surface: rgb(254 247 255); 
-  --md-sys-color-on-surface: rgb(29 27 32); 
-  --md-sys-color-surface-variant: rgb(231 224 235); 
-  --md-sys-color-on-surface-variant: rgb(73 69 78); 
-  --md-sys-color-outline: rgb(122 117 127); 
-  --md-sys-color-outline-variant: rgb(203 196 207); 
-  --md-sys-color-shadow: rgb(0 0 0); 
-  --md-sys-color-scrim: rgb(0 0 0); 
-  --md-sys-color-inverse-surface: rgb(50 47 53); 
-  --md-sys-color-inverse-on-surface: rgb(245 239 247); 
-  --md-sys-color-inverse-primary: rgb(211 187 253); 
-  --md-sys-color-primary-fixed: rgb(235 220 255); 
-  --md-sys-color-on-primary-fixed: rgb(35 15 70); 
-  --md-sys-color-primary-fixed-dim: rgb(211 187 253); 
-  --md-sys-color-on-primary-fixed-variant: rgb(80 60 116); 
-  --md-sys-color-secondary-fixed: rgb(234 222 247); 
-  --md-sys-color-on-secondary-fixed: rgb(31 24 42); 
-  --md-sys-color-secondary-fixed-dim: rgb(205 194 219); 
-  --md-sys-color-on-secondary-fixed-variant: rgb(75 67 88); 
-  --md-sys-color-tertiary-fixed: rgb(255 217 224); 
-  --md-sys-color-on-tertiary-fixed: rgb(50 16 27); 
-  --md-sys-color-tertiary-fixed-dim: rgb(241 183 196); 
-  --md-sys-color-on-tertiary-fixed-variant: rgb(100 59 70); 
-  --md-sys-color-surface-dim: rgb(222 216 224); 
-  --md-sys-color-surface-bright: rgb(254 247 255); 
-  --md-sys-color-surface-container-lowest: rgb(255 255 255); 
-  --md-sys-color-surface-container-low: rgb(248 241 250); 
-  --md-sys-color-surface-container: rgb(242 236 244); 
-  --md-sys-color-surface-container-high: rgb(237 230 238); 
-  --md-sys-color-surface-container-highest: rgb(231 224 232); 
+  --border-color: #ffc6c7; /* 边框色 */
+  --border-light: #ffc6c7; /* 浅边框色 */
+  --border-dark: #594a4e; /* 深边框色 */
   
   /* 阴影效果 - 柔和自然 */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -302,7 +251,7 @@ body {
 
 .search-box:focus-within {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(104, 84, 141, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 139, 167, 0.1);
 }
 
 .search-box input {
@@ -385,7 +334,7 @@ body {
 }
 
 .file-table tbody tr:hover {
-  background: rgba(104, 84, 141, 0.03);
+  background: rgba(255, 139, 167, 0.03);
 }
 
 /* 表格行选中效果 */
@@ -529,7 +478,7 @@ h1 {
 /* 拖拽激活状态 */
 .upload-container.drag-active {
   border-color: var(--primary-color);
-  background-color: rgba(104, 84, 141, 0.1);
+  background-color: rgba(255, 139, 167, 0.1);
   box-shadow: var(--shadow-md);
 }
 
@@ -581,7 +530,7 @@ h1 {
 
 .ant-upload-drag:hover {
   border-color: var(--primary-color);
-  background-color: rgba(104, 84, 141, 0.1);
+  background-color: rgba(255, 139, 167, 0.1);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
@@ -664,13 +613,13 @@ h1 {
 
 /* 危险按钮 */
 .btn-danger {
-  background-color: var(--error-color);
-  color: var(--md-sys-color-on-error);
+  background-color: #ff8ba7;
+  color: white;
 }
 
 .btn-danger:hover {
-  background-color: var(--md-sys-color-error-container);
-  color: var(--md-sys-color-on-error-container);
+  background-color: #ffc6c7;
+  color: var(--text-primary);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }

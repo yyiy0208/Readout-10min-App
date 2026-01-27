@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary colors -->
+    <color name="purple_80">#68548D</color>
+    <color name="purple_40">#D3BBFD</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Secondary colors -->
+    <color name="secondary_color">#635B70</color>
+    <color name="secondary_color_dark">#CDCADB</color>
+
+    <!-- Background colors -->
+    <color name="background_color">#FEF7FF</color>
+    <color name="on_background">#1D1B20</color>
+
+    <!-- Surface colors -->
+    <color name="surface_color">#FEF7FF</color>
+    <color name="on_surface">#1D1B20</color>
+
+    <!-- Error colors -->
+    <color name="error_color">#BA1A1A</color>
+    <color name="error_color_dark">#FFBAAE</color>
+
+    <!-- Other colors -->
+    <color name="tertiary_color">#7F525D</color>
+    <color name="tertiary_color_dark">#F1B7C4</color>
+    <color name="surface_variant">#E7E0EB</color>
+    <color name="on_surface_variant">#49454E</color>
+    <color name="outline">#7A757F</color>
+    <color name="outline_variant">#CBC4CF</color>
+    <color name="inverse_surface">#322F35</color>
+    <color name="inverse_on_surface">#F5EFF7</color>
+    <color name="inverse_primary">#D3BBFD</color>
+    <color name="surface_dim">#DEDAE0</color>
+    <color name="surface_bright">#FEF7FF</color>
+    <color name="surface_container_lowest">#FFFFFF</color>
+    <color name="surface_container_low">#F8F1FA</color>
+    <color name="surface_container">#F2ECF4</color>
+    <color name="surface_container_high">#EDE6EE</color>
+    <color name="surface_container_highest">#E7E0E8</color>
+    <color name="purple_container">#EBCDFF</color>
+    <color name="purple_container_text">#503C74</color>
+    <color name="secondary_container">#EADDDF</color>
+    <color name="secondary_container_text">#4B4358</color>
+    <color name="tertiary_container">#FFD9E0</color>
+    <color name="tertiary_container_text">#643B46</color>
+    <color name="error_container">#FFDADD</color>
+    <color name="error_container_text">#93000A</color>
+</resources>
