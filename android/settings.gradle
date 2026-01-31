@@ -5,6 +5,7 @@ pluginManagement {
         gradlePluginPortal()
         // 添加自定义仓库地址
         maven { url 'https://maven.aliyun.com' }
+        maven { url "https://jitpack.io" }
     }
 }
 

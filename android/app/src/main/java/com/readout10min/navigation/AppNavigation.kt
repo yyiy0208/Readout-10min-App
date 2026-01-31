@@ -14,6 +14,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,6 +39,11 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
     object ContentLibrary : Screen("content_library", "内容库", Icons.Default.Book)
     object ReadingPractice : Screen("reading_practice", "练习", Icons.Default.Refresh)
     object ProgressRecord : Screen("progress_record", "记录", Icons.Default.Settings)
+    
+    // 带参数的路由
+    companion object {
+        fun ReadingPracticeWithId(contentId: String) = "${ReadingPractice.route}/$contentId"
+    }
 }
 
 val screens = listOf(
@@ -49,36 +56,40 @@ val screens = listOf(
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val isNavBarVisible = remember { mutableStateOf(true) }
+    
     Scaffold(
         bottomBar = {
-            BottomAppBar(
-                containerColor = SurfaceVariant,
-            ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
+            if (isNavBarVisible.value) {
+                BottomAppBar(
+                    containerColor = SurfaceVariant,
+                ) {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
 
-                screens.forEach {
-                    NavigationBarItem(
-                        selected = currentDestination?.hierarchy?.any { destination -> destination.route == it.route } == true,
-                        onClick = {
-                            navController.navigate(it.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
+                    screens.forEach {
+                        NavigationBarItem(
+                            selected = currentDestination?.hierarchy?.any { destination -> destination.route == it.route } == true,
+                            onClick = {
+                                navController.navigate(it.route) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = { Icon(imageVector = it.icon, contentDescription = it.label) },
-                        label = { Text(it.label) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Purple80,
-                            selectedTextColor = Purple80,
-                            unselectedIconColor = OnSurfaceVariant,
-                            unselectedTextColor = OnSurfaceVariant,
-                            indicatorColor = SurfaceVariant
+                            },
+                            icon = { Icon(imageVector = it.icon, contentDescription = it.label) },
+                            label = { Text(it.label) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = Purple80,
+                                selectedTextColor = Purple80,
+                                unselectedIconColor = OnSurfaceVariant,
+                                unselectedTextColor = OnSurfaceVariant,
+                                indicatorColor = SurfaceVariant
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
@@ -89,16 +100,25 @@ fun AppNavigation() {
             modifier = androidx.compose.ui.Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen()
-            }
+                   HomeScreen(navController)
+               }
             composable(Screen.ContentLibrary.route) {
-                ContentLibraryScreen()
+                ContentLibraryScreen(navController)
             }
             composable(Screen.ReadingPractice.route) {
-                ReadingPracticeScreen()
+                ReadingPracticeScreen(navController, null, isNavBarVisible)
+            }
+            composable("${Screen.ReadingPractice.route}/{contentId}") {backStackEntry ->
+                val contentId = backStackEntry.arguments?.getString("contentId")
+                val uuid = try {
+                    java.util.UUID.fromString(contentId)
+                } catch (e: Exception) {
+                    null
+                }
+                ReadingPracticeScreen(navController, uuid, isNavBarVisible)
             }
             composable(Screen.ProgressRecord.route) {
-                ProgressRecordScreen()
+                ProgressRecordScreen(navController)
             }
         }
     }

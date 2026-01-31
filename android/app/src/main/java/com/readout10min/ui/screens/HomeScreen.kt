@@ -1,5 +1,6 @@
 package com.readout10min.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,13 +13,27 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.navigation.NavController
+import com.readout10min.data.models.Content
+import com.readout10min.data.repositories.ContentRepository
+import com.readout10min.navigation.Screen
 import com.readout10min.ui.theme.BackgroundColor
 import com.readout10min.ui.theme.OnBackground
 import com.readout10min.ui.theme.Purple80
@@ -27,9 +42,44 @@ import com.readout10min.ui.theme.SurfaceContainer
 import com.readout10min.ui.theme.SurfaceVariant
 import com.readout10min.ui.theme.Typography
 import com.readout10min.ui.theme.White
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.*
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
+    val context = LocalContext.current
+    val contentRepository = ContentRepository()
+    
+    var recommendedContent by remember { mutableStateOf<List<Content>>(emptyList()) }
+    var recentContent by remember { mutableStateOf<List<Content>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    
+    // 模拟用户ID
+    val userId = UUID.fromString("00000000-0000-0000-0000-000000000000")
+    
+    // 加载数据
+    LaunchedEffect(key1 = Unit) {
+        isLoading = true
+        try {
+            // 获取推荐内容
+            val recommended = withContext(Dispatchers.IO) {
+                contentRepository.getRecommendedContent()
+            }
+            recommendedContent = recommended
+            
+            // 获取最近阅读
+            val recent = withContext(Dispatchers.IO) {
+                contentRepository.getRecentContent(userId)
+            }
+            recentContent = recent
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            isLoading = false
+        }
+    }
+    
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -73,19 +123,26 @@ fun HomeScreen() {
                     Text(
                         text = "更多",
                         style = Typography.bodySmall,
-                        color = Purple80
+                        color = Purple80,
+                        modifier = Modifier.clickable { navController.navigate(Screen.ProgressRecord.route) }
                     )
                 }
+
+                // 增加标题与卡片之间的距离
+                Box(modifier = Modifier.height(12.dp))
 
                 //  stats card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
                         containerColor = SurfaceContainer
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 2.dp
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp)
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -149,49 +206,86 @@ fun HomeScreen() {
                     Text(
                         text = "查看全部",
                         style = Typography.bodySmall,
-                        color = Purple80
+                        color = Purple80,
+                        modifier = Modifier.clickable { navController.navigate(Screen.ContentLibrary.route) }
                     )
                 }
 
-                //  recommendation card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = SurfaceContainer
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                // 增加标题与卡片之间的距离
+                Box(modifier = Modifier.height(12.dp))
+
+                if (isLoading) {
+                    // 加载中
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "Sample Article Title",
-                            style = Typography.titleMedium,
-                            color = OnBackground
+                        CircularProgressIndicator(color = Purple80)
+                    }
+                } else if (recommendedContent.isNotEmpty()) {
+                    //  recommendation card
+                    val content = recommendedContent[0]
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = SurfaceContainer
+                        ),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = 2.dp
                         )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                text = "⏱️ 12 分钟",
-                                style = Typography.bodySmall,
+                                text = content.title,
+                                style = Typography.titleMedium,
                                 color = OnBackground
                             )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Text(
+                                    text = "⏱️ ${content.estimated_duration} 分钟",
+                                    style = Typography.bodySmall,
+                                    color = OnBackground
+                                )
+                            }
+                            Text(
+                                text = "This article is recommended for you based on your reading history and preferences...",
+                                style = Typography.bodyMedium,
+                                color = OnBackground
+                            )
+                            Button(
+                                onClick = { 
+                                    navController.navigate("${Screen.ReadingPractice.route}/${content.id}") 
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = Purple80
+                                ),
+                                shape = RoundedCornerShape(8.dp) // 调小圆角半径
+                            ) {
+                                Text(text = "开始练习")
+                            }
                         }
+                    }
+                } else {
+                    // 无推荐内容
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text(
-                            text = "This article is recommended for you based on your reading history and preferences...",
+                            text = "暂无推荐内容",
                             style = Typography.bodyMedium,
                             color = OnBackground
                         )
-                        Button(
-                            onClick = {},
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                                containerColor = Purple80
-                            )
-                        ) {
-                            Text(text = "开始练习")
-                        }
                     }
                 }
             }
@@ -212,127 +306,187 @@ fun HomeScreen() {
                     Text(
                         text = "查看全部",
                         style = Typography.bodySmall,
-                        color = Purple80
+                        color = Purple80,
+                        modifier = Modifier.clickable { navController.navigate(Screen.ContentLibrary.route) }
                     )
                 }
 
-                //  recent reading items
+                // 增加标题与卡片之间的距离
+                Box(modifier = Modifier.height(12.dp))
+
+                if (isLoading) {
+                    // 加载中
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Purple80)
+                    }
+                } else if (recentContent.isNotEmpty()) {
+                    //  recent reading items
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        recentContent.forEachIndexed { index, content ->
+                            if (index < 3) { // 最多显示3个
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { 
+                                            navController.navigate("${Screen.ReadingPractice.route}/${content.id}") 
+                                        },
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = SurfaceContainer
+                                    ),
+                                    elevation = CardDefaults.cardElevation(
+                                        defaultElevation = 2.dp
+                                    )
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column {
+                                            Text(
+                                                text = content.title,
+                                                style = Typography.bodyMedium,
+                                                color = OnBackground
+                                            )
+                                            Column(
+                                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                            ) {
+                                                Text(
+                                                    text = "${content.estimated_duration} 分钟",
+                                                    style = Typography.bodySmall,
+                                                    color = OnBackground
+                                                )
+                                                Text(
+                                                    text = "70%", // 模拟进度
+                                                    style = Typography.bodySmall,
+                                                    color = Color(76, 175, 80) // success color
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // 无最近阅读
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "暂无最近阅读",
+                            style = Typography.bodyMedium,
+                            color = OnBackground
+                        )
+                    }
+                }
+            }
+        }
+
+        // 底部导航栏
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .drawBehind {
+                    drawRect(color = SurfaceContainer)
+                }
+                .padding(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 首页
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .clickable { /* 跳转到首页 */ }
+                        .padding(8.dp)
                 ) {
-                    //  recent item 1
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = SurfaceContainer
+                    Text(
+                        text = "🏠",
+                        style = TextStyle(
+                            fontSize = 20.sp
                         )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(20.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Article 1",
-                                    style = Typography.bodyMedium,
-                                    color = OnBackground
-                                )
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Text(
-                                        text = "8 分钟",
-                                        style = Typography.bodySmall,
-                                        color = OnBackground
-                                    )
-                                    Text(
-                                        text = "70%",
-                                        style = Typography.bodySmall,
-                                        color = Color(76, 175, 80) // success color
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    //  recent item 2
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = SurfaceContainer
+                    )
+                    Text(
+                        text = "首页",
+                        style = Typography.bodySmall,
+                        color = Purple80
+                    )
+                }
+                
+                // 内容库
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .clickable { navController.navigate(Screen.ContentLibrary.route) }
+                        .padding(8.dp)
+                ) {
+                    Text(
+                        text = "📚",
+                        style = TextStyle(
+                            fontSize = 20.sp
                         )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(20.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Article 2",
-                                    style = Typography.bodyMedium,
-                                    color = OnBackground
-                                )
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Text(
-                                        text = "10 分钟",
-                                        style = Typography.bodySmall,
-                                        color = OnBackground
-                                    )
-                                    Text(
-                                        text = "30%",
-                                        style = Typography.bodySmall,
-                                        color = Color(76, 175, 80) // success color
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    //  recent item 3
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = SurfaceContainer
+                    )
+                    Text(
+                        text = "内容库",
+                        style = Typography.bodySmall,
+                        color = OnBackground
+                    )
+                }
+                
+                // 练习
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .clickable { navController.navigate(Screen.ReadingPractice.route) }
+                        .padding(8.dp)
+                ) {
+                    Text(
+                        text = "🔊",
+                        style = TextStyle(
+                            fontSize = 20.sp
                         )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(20.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Article 3",
-                                    style = Typography.bodyMedium,
-                                    color = OnBackground
-                                )
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Text(
-                                        text = "15 分钟",
-                                        style = Typography.bodySmall,
-                                        color = OnBackground
-                                    )
-                                    Text(
-                                        text = "100%",
-                                        style = Typography.bodySmall,
-                                        color = Color(76, 175, 80) // success color
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    )
+                    Text(
+                        text = "练习",
+                        style = Typography.bodySmall,
+                        color = OnBackground
+                    )
+                }
+                
+                // 记录
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .clickable { navController.navigate(Screen.ProgressRecord.route) }
+                        .padding(8.dp)
+                ) {
+                    Text(
+                        text = "📊",
+                        style = TextStyle(
+                            fontSize = 20.sp
+                        )
+                    )
+                    Text(
+                        text = "记录",
+                        style = Typography.bodySmall,
+                        color = OnBackground
+                    )
                 }
             }
         }
