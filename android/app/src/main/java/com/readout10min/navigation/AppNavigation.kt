@@ -43,6 +43,7 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
     // 带参数的路由
     companion object {
         fun ReadingPracticeWithId(contentId: String) = "${ReadingPractice.route}/$contentId"
+        fun ReadingPracticeWithIdAndParagraph(contentId: String, paragraphNumber: Int) = "${ReadingPractice.route}/$contentId?paragraph=$paragraphNumber"
     }
 }
 
@@ -68,15 +69,30 @@ fun AppNavigation() {
                     val currentDestination = navBackStackEntry?.destination
 
                     screens.forEach {
+                        val isSelected = when (it) {
+                            Screen.ReadingPractice -> {
+                                // 对于朗读页，检查当前路由是否以 reading_practice 开头
+                                currentDestination?.route?.startsWith(Screen.ReadingPractice.route) == true
+                            }
+                            else -> {
+                                currentDestination?.hierarchy?.any { destination -> destination.route == it.route } == true
+                            }
+                        }
+                        
                         NavigationBarItem(
-                            selected = currentDestination?.hierarchy?.any { destination -> destination.route == it.route } == true,
+                            selected = isSelected,
                             onClick = {
-                                navController.navigate(it.route) {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
+                                if (it == Screen.ContentLibrary && currentDestination?.route?.startsWith(Screen.ReadingPractice.route) == true) {
+                                    // 从朗读页返回内容库时，使用 navigateUp 保持状态
+                                    navController.navigateUp()
+                                } else {
+                                    navController.navigate(it.route) {
+                                        popUpTo(navController.graph.startDestinationId) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
                             },
                             icon = { Icon(imageVector = it.icon, contentDescription = it.label) },
@@ -106,16 +122,23 @@ fun AppNavigation() {
                 ContentLibraryScreen(navController)
             }
             composable(Screen.ReadingPractice.route) {
-                ReadingPracticeScreen(navController, null, isNavBarVisible)
+                ReadingPracticeScreen(navController, null, null, null, isNavBarVisible)
             }
-            composable("${Screen.ReadingPractice.route}/{contentId}") {backStackEntry ->
+            composable("${Screen.ReadingPractice.route}/{contentId}?paragraph={paragraph}&paragraphId={paragraphId}") {backStackEntry ->
                 val contentId = backStackEntry.arguments?.getString("contentId")
+                val paragraphNumber = backStackEntry.arguments?.getString("paragraph")?.toIntOrNull()
+                val paragraphIdStr = backStackEntry.arguments?.getString("paragraphId")
+                val paragraphId = try {
+                    java.util.UUID.fromString(paragraphIdStr)
+                } catch (e: Exception) {
+                    null
+                }
                 val uuid = try {
                     java.util.UUID.fromString(contentId)
                 } catch (e: Exception) {
                     null
                 }
-                ReadingPracticeScreen(navController, uuid, isNavBarVisible)
+                ReadingPracticeScreen(navController, uuid, paragraphNumber, paragraphId, isNavBarVisible)
             }
             composable(Screen.ProgressRecord.route) {
                 ProgressRecordScreen(navController)

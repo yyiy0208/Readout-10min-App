@@ -15,6 +15,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,28 +55,60 @@ fun HomeScreen(navController: NavController) {
     
     var recommendedContent by remember { mutableStateOf<List<Content>>(emptyList()) }
     var recentContent by remember { mutableStateOf<List<Content>>(emptyList()) }
+    var practiceDays by remember { mutableStateOf(0) }
+    var todayPracticeCount by remember { mutableStateOf(0) }
     var isLoading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var reloadTrigger by remember { mutableStateOf(UUID.randomUUID()) }
     
     // 模拟用户ID
     val userId = UUID.fromString("00000000-0000-0000-0000-000000000000")
     
     // 加载数据
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = Unit, key2 = reloadTrigger) {
         isLoading = true
+        error = null
         try {
             // 获取推荐内容
             val recommended = withContext(Dispatchers.IO) {
                 contentRepository.getRecommendedContent()
             }
-            recommendedContent = recommended
+            
+            // 检查推荐内容加载是否有错误
+            val recommendError = contentRepository.lastError
+            if (recommendError != null) {
+                error = recommendError
+            } else {
+                recommendedContent = recommended
+            }
             
             // 获取最近阅读
             val recent = withContext(Dispatchers.IO) {
                 contentRepository.getRecentContent(userId)
             }
-            recentContent = recent
+            
+            // 检查最近阅读加载是否有错误
+            val recentError = contentRepository.lastError
+            if (recentError != null && error == null) {
+                error = recentError
+            } else {
+                recentContent = recent
+            }
+            
+            // 获取练习天数
+            val days = withContext(Dispatchers.IO) {
+                contentRepository.getPracticeDays(userId)
+            }
+            practiceDays = days
+            
+            // 获取今日练习状态
+            val todayStatus = withContext(Dispatchers.IO) {
+                contentRepository.getTodayPracticeStatus(userId)
+            }
+            todayPracticeCount = todayStatus.first
         } catch (e: Exception) {
             e.printStackTrace()
+            error = "加载失败: ${e.message}"
         } finally {
             isLoading = false
         }
@@ -107,6 +141,43 @@ fun HomeScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            // 错误信息显示
+            if (error != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .drawBehind {
+                            drawRect(color = Color(255, 221, 221))
+                        }
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "错误信息",
+                            style = Typography.titleMedium,
+                            color = Color(183, 28, 28)
+                        )
+                        Text(
+                            text = error ?: "加载失败",
+                            style = Typography.bodyMedium,
+                            color = Color(183, 28, 28),
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                        Button(
+                            onClick = {
+                                // 重新加载
+                                reloadTrigger = UUID.randomUUID()
+                            },
+                            modifier = Modifier.padding(top = 12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(183, 28, 28)
+                            )
+                        ) {
+                            Text(text = "重新加载")
+                        }
+                    }
+                }
+            }
             // 练习统计
             Column {
                 //  section header
@@ -153,7 +224,7 @@ fun HomeScreen(navController: NavController) {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "15",
+                                    text = practiceDays.toString(),
                                     style = Typography.displayMedium,
                                     color = Purple80
                                 )
@@ -175,7 +246,7 @@ fun HomeScreen(navController: NavController) {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "0/1",
+                                    text = "${todayPracticeCount}/1",
                                     style = Typography.displayMedium,
                                     color = Purple80
                                 )

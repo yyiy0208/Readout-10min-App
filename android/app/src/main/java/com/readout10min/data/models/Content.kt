@@ -2,11 +2,13 @@ package com.readout10min.data.models
 
 import java.time.Instant
 import java.util.*
-import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+import com.readout10min.data.serializers.UUIDSerializer
+import com.readout10min.data.serializers.InstantSerializer
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class Content(
-    @Contextual val id: UUID = UUID.randomUUID(),
+    @Serializable(with = UUIDSerializer::class) val id: UUID = UUID.randomUUID(),
     val title: String,
     val author: String? = null,
     val source: String? = null,
@@ -19,7 +21,7 @@ data class Content(
     val estimated_duration: Int = 0,
     val difficulty: String = "medium",
     val language: String = "en",
-    @Contextual val created_at: Instant = Instant.now(),
-    @Contextual val updated_at: Instant = Instant.now(),
+    @Serializable(with = InstantSerializer::class) val created_at: Instant = Instant.now(),
+    @Serializable(with = InstantSerializer::class) val updated_at: Instant = Instant.now(),
     val created_by: String
 )

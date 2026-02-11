@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -40,8 +42,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import com.readout10min.data.SupabaseClient
 import com.readout10min.data.models.Content
 import com.readout10min.data.models.Paragraph
+import com.readout10min.data.models.Progress
 import com.readout10min.data.repositories.ContentRepository
 import com.readout10min.navigation.Screen
 import com.readout10min.ui.theme.OnBackground
@@ -183,6 +187,10 @@ fun ContentCard(
     val contentRepository = ContentRepository()
     var paragraphs by remember { mutableStateOf<List<Paragraph>>(emptyList()) }
     var isLoadingParagraphs by remember { mutableStateOf(false) }
+    var progressData by remember { mutableStateOf<Map<Int, Pair<Boolean, Boolean>>>(emptyMap()) }
+    
+    // 模拟用户ID
+    val userId = UUID.fromString("00000000-0000-0000-0000-000000000000")
     
     // 加载段落数据
     LaunchedEffect(key1 = isExpanded.value) {
@@ -193,6 +201,27 @@ fun ContentCard(
                     contentRepository.getParagraphsByContentId(content.id)
                 }
                 paragraphs = paragraphList
+                
+                // 加载阅读进度
+                val progressMap = mutableMapOf<Int, Pair<Boolean, Boolean>>() // (是否存在记录, 是否已完成)
+                paragraphList.forEach {
+                    progressMap[it.paragraph_number] = Pair(false, false)
+                }
+                
+                // 获取所有进度记录
+                val allProgress = withContext(Dispatchers.IO) {
+                    contentRepository.getAllProgressByUserIdAndContentId(userId, content.id)
+                }
+                
+                // 为每个段落单独获取实际的阅读进度
+                paragraphList.forEach { paragraph ->
+                    val progress = allProgress.find { it.current_paragraph == paragraph.paragraph_number }
+                    if (progress != null) {
+                        progressMap[paragraph.paragraph_number] = Pair(true, progress.is_completed)
+                    }
+                }
+                
+                progressData = progressMap
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -288,8 +317,9 @@ fun ContentCard(
             // 段落列表
             if (isExpanded.value) {
                 Column(
-                    modifier = Modifier.padding(top = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth()
                 ) {
                     Text(
                         text = "段落列表",
@@ -307,19 +337,69 @@ fun ContentCard(
                             CircularProgressIndicator(color = Purple80, strokeWidth = 2.dp)
                         }
                     } else if (paragraphs.isNotEmpty()) {
-                        paragraphs.forEach { paragraph ->
-                            val successColor = Color(76, 175, 80)
-                            val borderColor = Color(203, 196, 207)
-                            val backgroundColor = Color(254, 247, 255)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp) // 设置一个固定高度
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                paragraphs.forEach { paragraph ->
+                            val successColor = Color(76, 175, 80) // #4CAF50
+                            val primaryColor = Color(104, 84, 141) // 主色调
+                            val borderColor = Color(203, 196, 207) // 边框色
+                            val backgroundColor = Color(254, 247, 255) // 主背景色
+                            val backgroundLight = Color(231, 224, 235) // 辅助背景色
                             
-                            val cardColor = backgroundColor
-                            val borderColorValue = borderColor
+                            val statusInfo = progressData[paragraph.paragraph_number]
+                            
+                            // 卡片背景色
+                            val cardColor = when {
+                                statusInfo?.first == true && statusInfo.second -> Color(240, 253, 244) // 已完成 - 浅绿背景
+                                statusInfo?.first == true && !statusInfo.second -> Color(255, 248, 250) // 进行中 - 浅粉背景
+                                else -> backgroundColor // 未开始 - 默认背景
+                            }
+                            
+                            // 边框颜色
+                            val borderColorValue = when {
+                                statusInfo?.first == true && statusInfo.second -> successColor // 已完成 - 绿色边框
+                                statusInfo?.first == true && !statusInfo.second -> primaryColor // 进行中 - 主色调边框
+                                else -> borderColor // 未开始 - 默认边框
+                            }
+                            
+                            // 段落编号背景色
+                            val numberBackgroundColor = when {
+                                statusInfo?.first == true && statusInfo.second -> successColor // 已完成 - 绿色背景
+                                statusInfo?.first == true && !statusInfo.second -> primaryColor // 进行中 - 主色调背景
+                                else -> backgroundLight // 未开始 - 浅灰背景
+                            }
+                            
+                            // 段落编号文字色
+                            val numberTextColor = when {
+                                statusInfo?.first == true -> Color.White // 已完成和进行中 - 白色文字
+                                else -> OnBackground // 未开始 - 默认文字色
+                            }
+                            
+                            // 状态框背景色
+                            val statusBoxColor = when {
+                                statusInfo?.first == true && statusInfo.second -> successColor // 已完成 - 绿色背景
+                                statusInfo?.first == true && !statusInfo.second -> primaryColor // 进行中 - 主色调背景
+                                else -> backgroundLight // 未开始 - 浅灰背景
+                            }
+                            
+                            // 状态文字色
+                            val statusTextColor = when {
+                                statusInfo?.first == true -> Color.White // 已完成和进行中 - 白色文字
+                                else -> OnBackground // 未开始 - 默认文字色
+                            }
                             
                             // 段落容器，使用双Box方案实现带圆角的边框
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable { navController.navigate("${Screen.ReadingPractice.route}/${content.id}") }
+                                    .clickable { navController.navigate("${Screen.ReadingPractice.route}/${content.id}?paragraph=${paragraph.paragraph_number}&paragraphId=${paragraph.id}") }
                             ) {
                                 // 外层Box作为边框
                                 Box(
@@ -354,21 +434,21 @@ fun ContentCard(
                                                     .height(24.dp)
                                                     .clip(RoundedCornerShape(12.dp))
                                                     .drawBehind {
-                                                        drawRect(color = Color(231, 224, 235))
+                                                        drawRect(color = numberBackgroundColor)
                                                     }
                                                     .align(Alignment.CenterVertically)
                                             ) {
                                                 Text(
                                                     text = paragraph.paragraph_number.toString(),
                                                     style = Typography.bodySmall,
-                                                    color = OnBackground,
+                                                    color = numberTextColor,
                                                     modifier = Modifier.align(Alignment.Center)
                                                 )
                                             }
 
                                             // 段落标题
                                             Text(
-                                                text = "段落 ${paragraph.paragraph_number}",
+                                                text = "段落${paragraph.paragraph_number}",
                                                 style = Typography.bodyMedium,
                                                 color = OnBackground,
                                                 modifier = Modifier
@@ -378,31 +458,45 @@ fun ContentCard(
 
                                             // 段落时长
                                             Text(
-                                                text = "${paragraph.estimated_duration}分钟",
+                                                text = "${paragraph.estimated_duration / 60}分钟",
                                                 style = Typography.bodySmall,
                                                 color = OnBackground,
                                                 modifier = Modifier.padding(horizontal = 12.dp)
                                             )
 
                                             // 段落状态
+                                            val statusInfo = progressData[paragraph.paragraph_number]
+                                            val statusText = if (statusInfo?.first == true) {
+                                                if (statusInfo.second) {
+                                                    "已完成"
+                                                } else {
+                                                    "进行中"
+                                                }
+                                            } else {
+                                                "未开始"
+                                            }
+                                            
+                                            // 段落状态
                                             Box(
                                                 modifier = Modifier
                                                     .padding(4.dp, 2.dp, 4.dp, 2.dp)
                                                     .clip(RoundedCornerShape(9999.dp))
                                                     .drawBehind {
-                                                        drawRect(color = Color(231, 224, 235))
+                                                        drawRect(color = statusBoxColor)
                                                     }
                                             ) {
                                                 Text(
-                                                    text = "未开始",
+                                                    text = statusText,
                                                     style = Typography.bodySmall,
-                                                    color = OnBackground,
+                                                    color = statusTextColor,
                                                     modifier = Modifier.padding(8.dp, 4.dp, 8.dp, 4.dp)
                                                 )
                                             }
                                         }
                                     }
                                 }
+                            }
+                        }
                             }
                         }
                     } else {

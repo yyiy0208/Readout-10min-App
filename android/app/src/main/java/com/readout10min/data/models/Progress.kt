@@ -1,17 +1,13 @@
 package com.readout10min.data.models
 
-import java.time.Instant
 import java.util.*
-import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+import com.readout10min.data.serializers.UUIDSerializer
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class Progress(
-    @Contextual val id: UUID = UUID.randomUUID(),
-    @Contextual val user_id: UUID,
-    @Contextual val content_id: UUID,
+    @Serializable(with = UUIDSerializer::class) val user_id: UUID,
+    @Serializable(with = UUIDSerializer::class) val content_id: UUID,
     val current_paragraph: Int = 1,
-    val is_completed: Boolean = false,
-    val total_time_spent: Int = 0,
-    @Contextual val created_at: Instant = Instant.now(),
-    @Contextual val updated_at: Instant = Instant.now()
+    val is_completed: Boolean = false
 )

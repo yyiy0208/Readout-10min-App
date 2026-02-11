@@ -19,18 +19,72 @@ Readout-10min-App/
 ## 详细目录说明
 
 ### 1. android/
-Android 客户端代码，使用原生 Android 开发。
+Android 客户端代码，使用原生 Android 开发，基于 Compose UI 框架。
 
 ```
 android/
 ├── app/                 # 主应用模块
 │   ├── src/             # 源代码
+│   │   └── main/
+│   │       └── java/
+│   │           └── com/
+│   │               └── readout10min/
+│   │                   ├── data/              # 数据层
+│   │                   │   ├── models/         # 数据模型
+│   │                   │   ├── repositories/   # 数据仓库
+│   │                   │   ├── serializers/    # 序列化器
+│   │                   │   └── SupabaseClient.kt  # Supabase 客户端配置
+│   │                   ├── navigation/        # 导航配置
+│   │                   ├── ui/                # UI 层
+│   │                   │   ├── screens/       # 页面组件
+│   │                   │   └── theme/         # 主题配置
+│   │                   └── MainActivity.kt    # 主活动
 │   └── build.gradle     # 模块构建配置
 ├── gradle/              # Gradle 包装器
 ├── build.gradle         # 项目构建配置
 ├── gradle.properties    # Gradle 属性配置
 └── settings.gradle      # Gradle 设置
 ```
+
+#### Android 端核心文件说明
+
+##### 1. data/models/
+数据模型类，定义应用中使用的数据结构。
+
+- `Content.kt`：内容模型，包含文章信息
+- `Paragraph.kt`：段落模型，包含段落文本和时长
+- `PracticeRecord.kt`：练习记录模型，记录用户的练习情况
+- `Progress.kt`：进度模型，记录用户的学习进度
+
+##### 2. data/repositories/
+数据仓库类，负责数据的获取和存储。
+
+- `ContentRepository.kt`：内容仓库，处理内容和练习记录的 CRUD 操作
+
+##### 3. data/serializers/
+序列化器，用于处理 UUID 和 Instant 类型的序列化。
+
+- `Serializers.kt`：包含 UUID 和 Instant 的序列化器
+
+##### 4. navigation/
+导航配置，处理应用内页面跳转。
+
+- `AppNavigation.kt`：应用导航配置
+
+##### 5. ui/screens/
+页面组件，包含应用的各个页面。
+
+- `ContentLibraryScreen.kt`：内容库页面，展示可用的练习内容
+- `HomeScreen.kt`：首页，展示练习统计和推荐内容
+- `ProgressRecordScreen.kt`：进度记录页面，展示练习历史和统计
+- `ReadingPracticeScreen.kt`：阅读练习页面，进行朗读练习
+
+##### 6. ui/theme/
+主题配置，定义应用的视觉风格。
+
+- `Color.kt`：颜色配置
+- `Readout10minTheme.kt`：主题配置
+- `Typography.kt`：字体配置
 
 ### 2. docs/
 项目文档，包含开发计划、技术设计、数据库设计等。
@@ -44,7 +98,8 @@ docs/
 ├── SUPABASE_DATABASE_SETUP.sql # Supabase 数据库初始化脚本
 ├── SUPABASE_SETUP_GUIDE.md     # Supabase 配置指南
 ├── TECHNICAL_DESIGN.md         # 技术设计文档
-└── UI_DESIGN.md                # UI 设计规范
+├── UI_DESIGN.md                # UI 设计规范
+└── WORK_SUMMARY.md             # 工作总结
 ```
 
 ### 3. prototypes/
@@ -134,7 +189,7 @@ TypeScript 类型定义，统一管理应用中的类型。
 ## 技术栈
 
 - **Web 端**：React 18 + TypeScript 5 + Vite 5 + Ant Design 5 + react-router-dom
-- **Android 端**：原生 Android 开发
+- **Android 端**：Kotlin + Jetpack Compose + Coroutines + Supabase SDK
 - **数据库**：Supabase (PostgreSQL)
 - **文件存储**：Supabase Storage
 - **构建工具**：Vite (Web)、Gradle (Android)
@@ -176,3 +231,6 @@ TypeScript 类型定义，统一管理应用中的类型。
 - 2026-01-25：初始创建，记录当前文件结构
 - 2026-01-25：添加了 pages 目录，实现了路由管理
 - 2026-01-25：优化了组件结构，分离了业务逻辑和 UI 组件
+- 2026-02-11：更新了 Android 端文件结构，添加了详细的目录说明和核心文件说明
+- 2026-02-11：更新了技术栈，添加了 Android 端的具体技术
+- 2026-02-11：添加了 WORK_SUMMARY.md 到文档目录
