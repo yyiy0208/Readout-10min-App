@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,20 +37,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import com.readout10min.data.models.Paragraph as DataParagraph
 import com.readout10min.data.repositories.ContentRepository
 import com.readout10min.navigation.Screen
-import com.readout10min.ui.theme.OnBackground
 import com.readout10min.ui.theme.Purple80
-import com.readout10min.ui.theme.SurfaceContainer
-import com.readout10min.ui.theme.SurfaceVariant
 import com.readout10min.ui.theme.Typography
+import androidx.compose.material3.MaterialTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,53 +61,63 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
     val lifecycleOwner = LocalLifecycleOwner.current
     val contentRepository = ContentRepository()
     
+    // 获取主题颜色
+    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+    val onBackground = MaterialTheme.colorScheme.onBackground
+    
     // 状态管理
     val activePanel = remember { mutableStateOf<String?>(null) }
     val isControlsVisible = remember { mutableStateOf(true) }
-    val fontSize = remember { mutableStateOf(16.sp) }
-    val lineHeight = remember { mutableStateOf(24.sp) }
+    val fontSize = remember { mutableStateOf<Float>(16f) }
+    val lineHeight = remember { mutableStateOf<Float>(24f) }
     val backgroundColor = remember { mutableStateOf(Color.White) }
     val progress = remember { mutableStateOf(0.0f) } // 0.0 to 1.0
     
     var paragraphs by remember { mutableStateOf<List<DataParagraph>>(emptyList()) }
     var currentParagraph by remember { mutableStateOf<DataParagraph?>(null) }
-    var textPages by remember { mutableStateOf<List<String>>(emptyList()) }
-    var currentPageIndex by remember { mutableStateOf(0) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
+    val scrollState = rememberScrollState()
     
-    // 文本分页辅助函数
-    fun splitTextIntoPages(text: String): List<String> {
-        if (text.isBlank()) return emptyList()
-        
-        val pages = mutableListOf<String>()
-        val words = text.split(" ")
-        val currentPage = StringBuilder()
-        
-        // 改进的分页逻辑：根据字体大小动态计算
-        val maxCharsPerPage = when (fontSize.value.value.toInt()) {
-            14 -> 700  // 小字体可以显示更多内容
-            16 -> 600  // 中字体
-            18 -> 500  // 大字体
-            else -> 600
-        }
-        
-        for (word in words) {
-            val testPage = if (currentPage.isNotEmpty()) "${currentPage} ${word}" else word
-            if (testPage.length < maxCharsPerPage) {
-                currentPage.append(if (currentPage.isNotEmpty()) " " else "").append(word)
-            } else {
-                pages.add(currentPage.toString())
-                currentPage.clear()
-                currentPage.append(word)
+    // 监听滚动状态，更新进度
+    LaunchedEffect(key1 = scrollState.value) {
+        if (currentParagraph != null && contentId != null) {
+            val maxScroll = scrollState.maxValue
+            if (maxScroll > 0) {
+                progress.value = scrollState.value.toFloat() / maxScroll.toFloat()
+                
+                // 当滚动到接近末尾时，标记为已完成
+                if (progress.value > 0.95 && !isLoading) {
+                    // 更新进度为已完成
+                    val userId = UUID.fromString("00000000-0000-0000-0000-000000000000")
+                    val progressData = com.readout10min.data.models.Progress(
+                        user_id = userId,
+                        content_id = contentId,
+                        current_paragraph = currentParagraph!!.paragraph_number,
+                        is_completed = true // 标记为已完成
+                    )
+                    withContext(Dispatchers.IO) {
+                        contentRepository.updateProgress(progressData)
+                    }
+                    
+                    // 创建练习记录
+                    val practiceRecord = com.readout10min.data.models.PracticeRecord(
+                        user_id = userId,
+                        paragraph_id = currentParagraph!!.id,
+                        content_id = contentId,
+                        practice_date = java.time.LocalDateTime.now().toString(),
+                        duration = currentParagraph!!.estimated_duration, // estimated_duration 已经是秒
+                        accuracy = 0.0f, // 暂时使用默认值
+                        fluency = 0.0f, // 暂时使用默认值
+                        pronunciation_score = 0.0f // 暂时使用默认值
+                    )
+                    withContext(Dispatchers.IO) {
+                        contentRepository.createPracticeRecord(practiceRecord)
+                    }
+                }
             }
         }
-        
-        if (currentPage.isNotEmpty()) {
-            pages.add(currentPage.toString())
-        }
-        
-        return pages
     }
     
     // 加载段落数据
@@ -122,14 +132,11 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
                 // 加载所有段落
                 paragraphs = paragraphList
                 
-                // 如果指定了 paragraphId，定位到该段落并进行分页
+                // 如果指定了 paragraphId，定位到该段落
                 if (paragraphId != null) {
                     val targetParagraph = paragraphList.find { it.id == paragraphId }
                     if (targetParagraph != null) {
                         currentParagraph = targetParagraph
-                        // 对段落文本进行分页
-                        textPages = splitTextIntoPages(targetParagraph.text)
-                        currentPageIndex = 0
                         progress.value = 0f
                         
                         // 自动记录进度
@@ -153,8 +160,6 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
                         val targetParagraph = paragraphList.find { it.paragraph_number == paragraphNumber }
                         if (targetParagraph != null) {
                             currentParagraph = targetParagraph
-                            textPages = splitTextIntoPages(targetParagraph.text)
-                            currentPageIndex = 0
                             progress.value = 0f
                         }
                     }
@@ -163,34 +168,12 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
                     val targetParagraph = paragraphList.find { it.paragraph_number == paragraphNumber }
                     if (targetParagraph != null) {
                         currentParagraph = targetParagraph
-                        textPages = splitTextIntoPages(targetParagraph.text)
-                        currentPageIndex = 0
                         progress.value = 0f
                     }
                 } else if (paragraphList.isNotEmpty()) {
                     // 加载第一个段落
                     currentParagraph = paragraphList[0]
-                    textPages = splitTextIntoPages(paragraphList[0].text)
-                    currentPageIndex = 0
                     progress.value = 0f
-                }
-                
-                // 检查是否只有一页，如果是，直接标记为已完成
-                if (textPages.size == 1 && currentParagraph != null) {
-                    val paragraph = currentParagraph!!
-                    // 更新进度为已完成
-                    lifecycleOwner.lifecycleScope.launch {
-                        val userId = UUID.fromString("00000000-0000-0000-0000-000000000000")
-                        val progressData = com.readout10min.data.models.Progress(
-                            user_id = userId,
-                            content_id = contentId!!,
-                            current_paragraph = paragraph.paragraph_number,
-                            is_completed = true // 标记为已完成
-                        )
-                        withContext(Dispatchers.IO) {
-                            contentRepository.updateProgress(progressData)
-                        }
-                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -211,11 +194,11 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
         // 顶部导航栏
         if (isControlsVisible.value) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .drawBehind {
-                        drawRect(color = SurfaceContainer)
-                    }
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .drawBehind {
+                    drawRect(color = surfaceContainer)
+                }
                     .padding(12.dp)
             ) {
                 // 返回按钮
@@ -226,7 +209,7 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "返回首页",
-                        tint = OnBackground
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
             }
@@ -237,296 +220,112 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
-                .pointerInput(Unit) {
-                    detectHorizontalDragGestures(
-                                    onDragEnd = { }
-                                ) { change, dragAmount ->
-                                    if (!isLoading && error == null) {
-                                        val sensitivity = 50f // 滑动灵敏度，降低以提高用户体验
-                                        if (abs(dragAmount) > sensitivity) {
-                                            if (dragAmount < 0) {
-                                                // 向右滑动，下一页
-                                                if (textPages.isNotEmpty() && currentPageIndex < textPages.size - 1) {
-                                                    currentPageIndex++
-                                                    progress.value = currentPageIndex.toFloat() / textPages.size
-                                                    
-                                                    // 检查是否到达最后一页
-                                                    if (currentPageIndex == textPages.size - 1 && currentParagraph != null && contentId != null) {
-                                                        // 更新进度为已完成
-                                                        lifecycleOwner.lifecycleScope.launch {
-                                                            val userId = UUID.fromString("00000000-0000-0000-0000-000000000000")
-                                                            val progressData = com.readout10min.data.models.Progress(
-                                                                user_id = userId,
-                                                                content_id = contentId,
-                                                                current_paragraph = currentParagraph!!.paragraph_number,
-                                                                is_completed = true // 标记为已完成
-                                                            )
-                                                            withContext(Dispatchers.IO) {
-                                                                contentRepository.updateProgress(progressData)
-                                                            }
-                                                            
-                                                            // 创建练习记录
-                                                            val practiceRecord = com.readout10min.data.models.PracticeRecord(
-                                                                user_id = userId,
-                                                                paragraph_id = currentParagraph!!.id,
-                                                                content_id = contentId,
-                                                                practice_date = java.time.LocalDateTime.now().toString(),
-                                                                duration = currentParagraph!!.estimated_duration, // estimated_duration 已经是秒
-                                                                accuracy = 0.0f, // 暂时使用默认值
-                                                                fluency = 0.0f, // 暂时使用默认值
-                                                                pronunciation_score = 0.0f // 暂时使用默认值
-                                                            )
-                                                            withContext(Dispatchers.IO) {
-                                                                contentRepository.createPracticeRecord(practiceRecord)
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                // 向左滑动，上一页
-                                                if (textPages.isNotEmpty() && currentPageIndex > 0) {
-                                                    currentPageIndex--
-                                                    progress.value = currentPageIndex.toFloat() / textPages.size
-                                                }
+        ) {
+            // 直接使用Box作为内容容器，移除左右点击区域
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable {
+                        if (!isLoading && error == null) {
+                            isControlsVisible.value = !isControlsVisible.value
+                            isNavBarVisible.value = !isNavBarVisible.value
+                        }
+                    }
+            ) {
+                if (isLoading) {
+                    // 加载中
+                    CircularProgressIndicator(color = Purple80, modifier = Modifier.align(Alignment.Center))
+                } else if (error != null) {
+                    // 错误信息
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = error ?: "加载失败",
+                            style = Typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Button(
+                            onClick = { 
+                                // 重新加载
+                                lifecycleOwner.lifecycleScope.launch {
+                                    if (contentId != null) {
+                                        isLoading = true
+                                        try {
+                                            val paragraphList = withContext(Dispatchers.IO) {
+                                                contentRepository.getParagraphsByContentId(contentId)
                                             }
+                                            paragraphs = paragraphList
+                                            error = null
+                                        } catch (e: Exception) {
+                                            e.printStackTrace()
+                                            error = "加载失败，请重试"
+                                        } finally {
+                                            isLoading = false
                                         }
                                     }
                                 }
-                }
-        ) {
-            Row(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // 左侧点击区域 - 上一页
-                Box(
-                    modifier = Modifier
-                        .width(40.dp)
-                        .fillMaxHeight()
-                        .clickable {
-                            if (!isLoading && error == null && textPages.isNotEmpty() && currentPageIndex > 0) {
-                                currentPageIndex--
-                                progress.value = currentPageIndex.toFloat() / textPages.size
-                            }
-                        }
-                )
-                
-                // 中间内容区域
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .clickable {
-                            if (!isLoading && error == null) {
-                                isControlsVisible.value = !isControlsVisible.value
-                                isNavBarVisible.value = !isNavBarVisible.value
-                            }
-                        }
-                ) {
-                    if (isLoading) {
-                        // 加载中
-                        CircularProgressIndicator(color = Purple80, modifier = Modifier.align(Alignment.Center))
-                    } else if (error != null) {
-                        // 错误信息
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = error ?: "加载失败",
-                                style = Typography.bodyMedium,
-                                color = OnBackground,
-                                modifier = Modifier.padding(16.dp)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Purple80
                             )
-                            Button(
-                                onClick = { 
-                                    // 重新加载
-                                    lifecycleOwner.lifecycleScope.launch {
-                                        if (contentId != null) {
-                                            isLoading = true
-                                            try {
-                                                val paragraphList = withContext(Dispatchers.IO) {
-                                                    contentRepository.getParagraphsByContentId(contentId)
-                                                }
-                                                paragraphs = paragraphList
-                                                error = null
-                                            } catch (e: Exception) {
-                                                e.printStackTrace()
-                                                error = "加载失败，请重试"
-                                            } finally {
-                                                isLoading = false
-                                            }
-                                        }
-                                    }
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Purple80
-                                )
-                            ) {
-                                Text(text = "重新加载")
-                            }
-                        }
-                    } else if (currentParagraph == null) {
-                        // 无内容
-                        Text(
-                            text = "暂无内容",
-                            style = Typography.bodyMedium,
-                            color = OnBackground,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    } else {
-                        // 正常显示内容
-                        Box(
-                            modifier = Modifier.fillMaxSize()
                         ) {
-                            // 文章内容
-                            val displayText = if (textPages.isNotEmpty() && currentPageIndex < textPages.size) {
-                                textPages[currentPageIndex]
-                            } else {
-                                currentParagraph?.text ?: ""
-                            }
-                            
-                            Text(
+                            Text(text = "重新加载")
+                        }
+                    }
+                } else if (currentParagraph == null) {
+                    // 无内容
+                    Text(
+                        text = "暂无内容",
+                        style = Typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                } else {
+                    // 正常显示内容
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        // 文章内容
+                        val displayText = currentParagraph?.text ?: ""
+                        
+                        Text(
                                 text = displayText,
                                 style = Typography.bodyLarge.copy(
-                                    fontSize = fontSize.value,
-                                    lineHeight = lineHeight.value
+                                    fontSize = fontSize.value.sp,
+                                    lineHeight = lineHeight.value.sp
                                 ),
-                                color = OnBackground,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(16.dp),
+                                    .padding(16.dp)
+                                    .verticalScroll(scrollState),
                                 softWrap = true,
                                 overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Start
                             )
-                            
-                            // 页面指示器
-                            if (textPages.size > 1) {
-                                Row(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomCenter)
-                                        .padding(bottom = 24.dp),
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    textPages.forEachIndexed { index, _ ->
-                                        Box(
-                                            modifier = Modifier
-                                                .width(8.dp)
-                                                .height(8.dp)
-                                                .padding(2.dp)
-                                                .clip(RoundedCornerShape(4.dp))
-                                                .drawBehind {
-                                                    drawRect(
-                                                        color = if (index == currentPageIndex) Purple80 else SurfaceVariant.copy(alpha = 0.5f)
-                                                    )
-                                                }
-                                                .clickable {
-                                                    currentPageIndex = index
-                                                    progress.value = index.toFloat() / textPages.size
-                                                    
-                                                    // 检查是否到达最后一页
-                                                    if (currentPageIndex == textPages.size - 1 && currentParagraph != null && contentId != null) {
-                                                        // 更新进度为已完成
-                                                        lifecycleOwner.lifecycleScope.launch {
-                                                            val userId = UUID.fromString("00000000-0000-0000-0000-000000000000")
-                                                            val progressData = com.readout10min.data.models.Progress(
-                                                                user_id = userId,
-                                                                content_id = contentId,
-                                                                current_paragraph = currentParagraph!!.paragraph_number,
-                                                                is_completed = true // 标记为已完成
-                                                            )
-                                                            withContext(Dispatchers.IO) {
-                                                                contentRepository.updateProgress(progressData)
-                                                            }
-                                                            
-                                                            // 创建练习记录
-                                                            val practiceRecord = com.readout10min.data.models.PracticeRecord(
-                                                                user_id = userId,
-                                                                paragraph_id = currentParagraph!!.id,
-                                                                content_id = contentId,
-                                                                practice_date = java.time.LocalDateTime.now().toString(),
-                                                                duration = currentParagraph!!.estimated_duration, // estimated_duration 已经是秒
-                                                                accuracy = 0.0f, // 暂时使用默认值
-                                                                fluency = 0.0f, // 暂时使用默认值
-                                                                pronunciation_score = 0.0f // 暂时使用默认值
-                                                            )
-                                                            withContext(Dispatchers.IO) {
-                                                                contentRepository.createPracticeRecord(practiceRecord)
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                        )
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
-                
-                // 右侧点击区域 - 下一页
-                Box(
-                    modifier = Modifier
-                        .width(40.dp)
-                        .fillMaxHeight()
-                        .clickable {
-                            if (!isLoading && error == null && textPages.isNotEmpty() && currentPageIndex < textPages.size - 1) {
-                                currentPageIndex++
-                                progress.value = currentPageIndex.toFloat() / textPages.size
-                                
-                                // 检查是否到达最后一页
-                                if (currentPageIndex == textPages.size - 1 && currentParagraph != null && contentId != null) {
-                                    // 更新进度为已完成
-                                    lifecycleOwner.lifecycleScope.launch {
-                                        val userId = UUID.fromString("00000000-0000-0000-0000-000000000000")
-                                        val progressData = com.readout10min.data.models.Progress(
-                                            user_id = userId,
-                                            content_id = contentId,
-                                            current_paragraph = currentParagraph!!.paragraph_number,
-                                            is_completed = true // 标记为已完成
-                                        )
-                                        withContext(Dispatchers.IO) {
-                                            contentRepository.updateProgress(progressData)
-                                        }
-                                        
-                                        // 创建练习记录
-                                        val practiceRecord = com.readout10min.data.models.PracticeRecord(
-                                            user_id = userId,
-                                            paragraph_id = currentParagraph!!.id,
-                                            content_id = contentId,
-                                            practice_date = java.time.LocalDateTime.now().toString(),
-                                            duration = currentParagraph!!.estimated_duration, // estimated_duration 已经是秒
-                                            accuracy = 0.0f, // 暂时使用默认值
-                                            fluency = 0.0f, // 暂时使用默认值
-                                            pronunciation_score = 0.0f // 暂时使用默认值
-                                        )
-                                        withContext(Dispatchers.IO) {
-                                            contentRepository.createPracticeRecord(practiceRecord)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                )
             }
         }
 
         // 进度条 - 固定在最下面
         if (!isLoading && error == null && currentParagraph != null) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(6.dp)
-                    .drawBehind {
-                        drawRect(color = SurfaceVariant.copy(alpha = 0.5f))
-                    }
-                    .clip(RoundedCornerShape(9999.dp))
-            ) {
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .drawBehind {
+                            drawRect(color = surfaceVariant.copy(alpha = 0.5f))
+                        }
+                        .clip(RoundedCornerShape(9999.dp))
+                ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(if (textPages.size <= 1) 1f else progress.value)
+                        .fillMaxWidth(progress.value)
                         .height(6.dp)
                         .drawBehind {
                             drawRect(color = Purple80)
@@ -544,7 +343,7 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
                 modifier = Modifier
                     .fillMaxWidth()
                     .drawBehind {
-                        drawRect(color = SurfaceContainer)
+                        drawRect(color = surfaceContainer)
                     }
                     .padding(8.dp)
             ) {
@@ -562,8 +361,8 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
                             .weight(1f)
                             .padding(4.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (activePanel.value == "font") Purple80 else Color(231, 224, 235).copy(alpha = 0.8f),
-                            contentColor = if (activePanel.value == "font") Color.White else OnBackground
+                            containerColor = if (activePanel.value == "font") Purple80 else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                            contentColor = if (activePanel.value == "font") Color.White else MaterialTheme.colorScheme.onBackground
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
@@ -583,8 +382,8 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
                             .weight(1f)
                             .padding(4.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (activePanel.value == "spacing") Purple80 else Color(231, 224, 235).copy(alpha = 0.8f),
-                            contentColor = if (activePanel.value == "spacing") Color.White else OnBackground
+                            containerColor = if (activePanel.value == "spacing") Purple80 else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                            contentColor = if (activePanel.value == "spacing") Color.White else MaterialTheme.colorScheme.onBackground
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
@@ -604,8 +403,8 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
                             .weight(1f)
                             .padding(4.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (activePanel.value == "background") Purple80 else Color(231, 224, 235).copy(alpha = 0.8f),
-                            contentColor = if (activePanel.value == "background") Color.White else OnBackground
+                            containerColor = if (activePanel.value == "background") Purple80 else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                            contentColor = if (activePanel.value == "background") Color.White else MaterialTheme.colorScheme.onBackground
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
@@ -621,49 +420,49 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
             // 字体选项面板
             if (activePanel.value == "font") {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .drawBehind {
-                            drawRect(color = SurfaceContainer)
-                        }
-                        .padding(16.dp)
-                ) {
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .drawBehind {
+                        drawRect(color = surfaceContainer)
+                    }
+                    .padding(16.dp)
+            ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         Button(
                             onClick = { 
-                                fontSize.value = 14.sp
+                                fontSize.value = 14f
                             },
                             modifier = Modifier.weight(1f).padding(4.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (fontSize.value == 14.sp) Purple80 else Color(231, 224, 235).copy(alpha = 0.8f),
-                                contentColor = if (fontSize.value == 14.sp) Color.White else OnBackground
+                                containerColor = if (fontSize.value == 14f) Purple80 else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                                contentColor = if (fontSize.value == 14f) Color.White else MaterialTheme.colorScheme.onBackground
                             )
                         ) {
                             Text(text = "小")
                         }
                         Button(
                             onClick = { 
-                                fontSize.value = 16.sp
+                                fontSize.value = 16f
                             },
                             modifier = Modifier.weight(1f).padding(4.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (fontSize.value == 16.sp) Purple80 else Color(231, 224, 235).copy(alpha = 0.8f),
-                                contentColor = if (fontSize.value == 16.sp) Color.White else OnBackground
+                                containerColor = if (fontSize.value == 16f) Purple80 else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                                contentColor = if (fontSize.value == 16f) Color.White else MaterialTheme.colorScheme.onBackground
                             )
                         ) {
                             Text(text = "中")
                         }
                         Button(
                             onClick = { 
-                                fontSize.value = 18.sp
+                                fontSize.value = 18f
                             },
                             modifier = Modifier.weight(1f).padding(4.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (fontSize.value == 18.sp) Purple80 else Color(231, 224, 235).copy(alpha = 0.8f),
-                                contentColor = if (fontSize.value == 18.sp) Color.White else OnBackground
+                                containerColor = if (fontSize.value == 18f) Purple80 else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                                contentColor = if (fontSize.value == 18f) Color.White else MaterialTheme.colorScheme.onBackground
                             )
                         ) {
                             Text(text = "大")
@@ -675,49 +474,49 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
             // 行间距选项面板
             if (activePanel.value == "spacing") {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .drawBehind {
-                            drawRect(color = SurfaceContainer)
-                        }
-                        .padding(16.dp)
-                ) {
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .drawBehind {
+                        drawRect(color = surfaceContainer)
+                    }
+                    .padding(16.dp)
+            ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         Button(
                             onClick = { 
-                                lineHeight.value = 20.sp
+                                lineHeight.value = 20f
                             },
                             modifier = Modifier.weight(1f).padding(4.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (lineHeight.value == 20.sp) Purple80 else Color(231, 224, 235).copy(alpha = 0.8f),
-                                contentColor = if (lineHeight.value == 20.sp) Color.White else OnBackground
+                                containerColor = if (lineHeight.value == 20f) Purple80 else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                                contentColor = if (lineHeight.value == 20f) Color.White else MaterialTheme.colorScheme.onBackground
                             )
                         ) {
                             Text(text = "缩小")
                         }
                         Button(
                             onClick = { 
-                                lineHeight.value = 24.sp
+                                lineHeight.value = 24f
                             },
                             modifier = Modifier.weight(1f).padding(4.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (lineHeight.value == 24.sp) Purple80 else Color(231, 224, 235).copy(alpha = 0.8f),
-                                contentColor = if (lineHeight.value == 24.sp) Color.White else OnBackground
+                                containerColor = if (lineHeight.value == 24f) Purple80 else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                                contentColor = if (lineHeight.value == 24f) Color.White else MaterialTheme.colorScheme.onBackground
                             )
                         ) {
                             Text(text = "标准")
                         }
                         Button(
                             onClick = { 
-                                lineHeight.value = 28.sp
+                                lineHeight.value = 28f
                             },
                             modifier = Modifier.weight(1f).padding(4.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (lineHeight.value == 28.sp) Purple80 else Color(231, 224, 235).copy(alpha = 0.8f),
-                                contentColor = if (lineHeight.value == 28.sp) Color.White else OnBackground
+                                containerColor = if (lineHeight.value == 28f) Purple80 else surfaceVariant.copy(alpha = 0.8f),
+                                contentColor = if (lineHeight.value == 28f) Color.White else onBackground
                             )
                         ) {
                             Text(text = "增加")
@@ -732,7 +531,7 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
                     modifier = Modifier
                         .fillMaxWidth()
                         .drawBehind {
-                            drawRect(color = SurfaceContainer)
+                            drawRect(color = surfaceContainer)
                         }
                         .padding(16.dp)
                 ) {

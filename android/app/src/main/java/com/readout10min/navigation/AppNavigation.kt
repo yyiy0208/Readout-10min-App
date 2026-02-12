@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,6 +34,12 @@ import com.readout10min.ui.theme.Purple80
 import com.readout10min.ui.theme.SurfaceVariant
 import com.readout10min.ui.theme.OnSurfaceVariant
 import com.readout10min.ui.theme.OnSurface
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.UUID
+import com.readout10min.data.repositories.ContentRepository
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
     object Home : Screen("home", "首页", Icons.Default.Home)
@@ -58,6 +65,33 @@ val screens = listOf(
 fun AppNavigation() {
     val navController = rememberNavController()
     val isNavBarVisible = remember { mutableStateOf(true) }
+    val contentRepository = remember { ContentRepository() }
+    val lastPracticeContent = remember { mutableStateOf<UUID?>(null) }
+    val lastPracticeParagraph = remember { mutableStateOf<Int?>(null) }
+    
+    // 加载上一次练习的内容
+    LaunchedEffect(key1 = Unit) {
+        try {
+            // 模拟用户ID
+            val userId = UUID.fromString("00000000-0000-0000-0000-000000000000")
+            
+            // 获取最近的进度记录
+            val progressList = withContext(Dispatchers.IO) {
+                contentRepository.getAllProgress(userId)
+            }
+            
+            if (progressList.isNotEmpty()) {
+                // 按更新时间排序，取最近的一条
+                val latestProgress = progressList.firstOrNull()
+                if (latestProgress != null) {
+                    lastPracticeContent.value = latestProgress.content_id
+                    lastPracticeParagraph.value = latestProgress.current_paragraph
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
     
     Scaffold(
         bottomBar = {
@@ -85,7 +119,40 @@ fun AppNavigation() {
                                 if (it == Screen.ContentLibrary && currentDestination?.route?.startsWith(Screen.ReadingPractice.route) == true) {
                                     // 从朗读页返回内容库时，使用 navigateUp 保持状态
                                     navController.navigateUp()
+                                } else if (it == Screen.ReadingPractice) {
+                                    // 点击练习图标时，打开上一次练习的内容
+                                    if (lastPracticeContent.value != null) {
+                                        if (lastPracticeParagraph.value != null) {
+                                            // 有段落信息，导航到指定段落
+                                            navController.navigate("${Screen.ReadingPractice.route}/${lastPracticeContent.value}?paragraph=${lastPracticeParagraph.value}") {
+                                                popUpTo(navController.graph.startDestinationId) {
+                                                    saveState = true
+                                                }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
+                                        } else {
+                                            // 没有段落信息，导航到内容首页
+                                            navController.navigate("${Screen.ReadingPractice.route}/${lastPracticeContent.value}") {
+                                                popUpTo(navController.graph.startDestinationId) {
+                                                    saveState = true
+                                                }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
+                                        }
+                                    } else {
+                                        // 没有练习记录，导航到练习页默认路由
+                                        navController.navigate(it.route) {
+                                            popUpTo(navController.graph.startDestinationId) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
                                 } else {
+                                    // 其他图标正常导航
                                     navController.navigate(it.route) {
                                         popUpTo(navController.graph.startDestinationId) {
                                             saveState = true

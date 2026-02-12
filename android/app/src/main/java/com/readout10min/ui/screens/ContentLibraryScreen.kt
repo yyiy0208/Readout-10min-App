@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -48,11 +49,10 @@ import com.readout10min.data.models.Paragraph
 import com.readout10min.data.models.Progress
 import com.readout10min.data.repositories.ContentRepository
 import com.readout10min.navigation.Screen
-import com.readout10min.ui.theme.OnBackground
 import com.readout10min.ui.theme.Purple80
-import com.readout10min.ui.theme.SurfaceContainer
-import com.readout10min.ui.theme.SurfaceVariant
 import com.readout10min.ui.theme.Typography
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.isSystemInDarkTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -63,6 +63,11 @@ fun ContentLibraryScreen(navController: NavController) {
     val context = LocalContext.current
     val contentRepository = ContentRepository()
     val searchText = remember { mutableStateOf("") }
+    
+    // 获取主题颜色
+    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+    val onBackground = MaterialTheme.colorScheme.onBackground
     
     var contentList by remember { mutableStateOf<List<Content>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -90,7 +95,7 @@ fun ContentLibraryScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .drawBehind {
-                    drawRect(color = SurfaceContainer)
+                    drawRect(color = surfaceContainer)
                 }
                 .padding(12.dp)
         ) {
@@ -102,7 +107,7 @@ fun ContentLibraryScreen(navController: NavController) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "返回首页",
-                    tint = OnBackground
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
@@ -112,6 +117,7 @@ fun ContentLibraryScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
+                .verticalScroll(rememberScrollState()) // 添加竖直滚动条
         ) {
             if (isLoading) {
                 // 加载中
@@ -142,10 +148,10 @@ fun ContentLibraryScreen(navController: NavController) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "暂无内容",
-                        style = Typography.bodyMedium,
-                        color = OnBackground
-                    )
+                    text = "暂无内容",
+                    style = Typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
                 }
             }
         }
@@ -185,6 +191,12 @@ fun ContentCard(
 ) {
     val isExpanded = remember { mutableStateOf(false) }
     val contentRepository = ContentRepository()
+    
+    // 获取主题颜色
+    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+    val onBackground = MaterialTheme.colorScheme.onBackground
+    
     var paragraphs by remember { mutableStateOf<List<Paragraph>>(emptyList()) }
     var isLoadingParagraphs by remember { mutableStateOf(false) }
     var progressData by remember { mutableStateOf<Map<Int, Pair<Boolean, Boolean>>>(emptyMap()) }
@@ -193,8 +205,8 @@ fun ContentCard(
     val userId = UUID.fromString("00000000-0000-0000-0000-000000000000")
     
     // 加载段落数据
-    LaunchedEffect(key1 = isExpanded.value) {
-        if (isExpanded.value && paragraphs.isEmpty()) {
+    LaunchedEffect(key1 = Unit) {
+        if (paragraphs.isEmpty() || progressData.isEmpty()) {
             isLoadingParagraphs = true
             try {
                 val paragraphList = withContext(Dispatchers.IO) {
@@ -235,7 +247,7 @@ fun ContentCard(
             .fillMaxWidth()
             .clickable { navController.navigate("${Screen.ReadingPractice.route}/${content.id}") },
         colors = CardDefaults.cardColors(
-            containerColor = SurfaceContainer
+            containerColor = surfaceContainer
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
@@ -253,12 +265,12 @@ fun ContentCard(
                 Text(
                     text = content.title,
                     style = Typography.titleMedium,
-                    color = OnBackground
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
                     text = if (isExpanded.value) "▲" else "▼",
                     style = Typography.bodySmall,
-                    color = OnBackground,
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.clickable { isExpanded.value = !isExpanded.value }
                 )
             }
@@ -272,13 +284,13 @@ fun ContentCard(
                     Text(
                         text = "作者：$it",
                         style = Typography.bodySmall,
-                        color = OnBackground
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Text(
-                    text = "预估总时长：${content.estimated_duration}分钟",
+                    text = "预估总时长：${content.estimated_duration / 60}分钟",
                     style = Typography.bodySmall,
-                    color = OnBackground
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
 
@@ -287,24 +299,48 @@ fun ContentCard(
                 modifier = Modifier.padding(top = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                // 计算文章状态
+                val articleStatus = if (progressData.isEmpty()) {
+                    "未读"
+                } else {
+                    val hasCompleted = progressData.values.any { it.first && it.second }
+                    val hasInProgress = progressData.values.any { it.first && !it.second }
+                    val allCompleted = progressData.values.all { it.first && it.second }
+                    
+                    when {
+                        allCompleted -> "已读完"
+                        hasCompleted || hasInProgress -> "阅读中"
+                        else -> "未读"
+                    }
+                }
+                
                 Text(
-                    text = "未读", // 模拟状态
+                    text = articleStatus,
                     style = Typography.bodySmall,
-                    color = OnBackground
+                    color = MaterialTheme.colorScheme.onBackground
                 )
+                
+                // 计算进度百分比
+                val progressPercentage = if (progressData.isEmpty()) {
+                    0f
+                } else {
+                    val completedCount = progressData.values.count { it.first && it.second }
+                    completedCount.toFloat() / progressData.size
+                }
+                
                 // 进度条
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(4.dp)
                         .drawBehind {
-                            drawRect(color = SurfaceVariant)
+                            drawRect(color = surfaceVariant)
                         }
                         .borderRadius(2.dp)
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(0f) // 模拟进度
+                            .fillMaxWidth(progressPercentage)
                             .height(4.dp)
                             .drawBehind {
                                 drawRect(color = Purple80)
@@ -315,43 +351,40 @@ fun ContentCard(
             }
 
             // 段落列表
-            if (isExpanded.value) {
-                Column(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = "段落列表",
-                        style = Typography.titleSmall,
-                        color = OnBackground,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    
-                    if (isLoadingParagraphs) {
-                        Box(
-                            modifier = Modifier
-                                .height(100.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = Purple80, strokeWidth = 2.dp)
-                        }
-                    } else if (paragraphs.isNotEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(300.dp) // 设置一个固定高度
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                if (isExpanded.value) {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "段落列表",
+                            style = Typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        
+                        if (isLoadingParagraphs) {
+                            Box(
+                                modifier = Modifier
+                                    .height(100.dp),
+                                contentAlignment = Alignment.Center
                             ) {
-                                paragraphs.forEach { paragraph ->
+                                CircularProgressIndicator(color = Purple80, strokeWidth = 2.dp)
+                            }
+                        } else if (paragraphs.isNotEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp) // 设置一个固定高度
+                                    .verticalScroll(rememberScrollState())
+                            ) {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(4.dp) // 增加间距
+                                ) {
+                                    paragraphs.forEach { paragraph ->
                             val successColor = Color(76, 175, 80) // #4CAF50
                             val primaryColor = Color(104, 84, 141) // 主色调
-                            val borderColor = Color(203, 196, 207) // 边框色
-                            val backgroundColor = Color(254, 247, 255) // 主背景色
-                            val backgroundLight = Color(231, 224, 235) // 辅助背景色
                             
                             val statusInfo = progressData[paragraph.paragraph_number]
                             
@@ -359,40 +392,40 @@ fun ContentCard(
                             val cardColor = when {
                                 statusInfo?.first == true && statusInfo.second -> Color(240, 253, 244) // 已完成 - 浅绿背景
                                 statusInfo?.first == true && !statusInfo.second -> Color(255, 248, 250) // 进行中 - 浅粉背景
-                                else -> backgroundColor // 未开始 - 默认背景
+                                else -> surfaceContainer // 未开始 - 使用主题背景
                             }
                             
                             // 边框颜色
                             val borderColorValue = when {
                                 statusInfo?.first == true && statusInfo.second -> successColor // 已完成 - 绿色边框
                                 statusInfo?.first == true && !statusInfo.second -> primaryColor // 进行中 - 主色调边框
-                                else -> borderColor // 未开始 - 默认边框
+                                else -> MaterialTheme.colorScheme.outline // 未开始 - 使用主题边框色
                             }
                             
                             // 段落编号背景色
                             val numberBackgroundColor = when {
                                 statusInfo?.first == true && statusInfo.second -> successColor // 已完成 - 绿色背景
                                 statusInfo?.first == true && !statusInfo.second -> primaryColor // 进行中 - 主色调背景
-                                else -> backgroundLight // 未开始 - 浅灰背景
+                                else -> surfaceVariant // 未开始 - 使用主题表面变体色
                             }
                             
                             // 段落编号文字色
                             val numberTextColor = when {
                                 statusInfo?.first == true -> Color.White // 已完成和进行中 - 白色文字
-                                else -> OnBackground // 未开始 - 默认文字色
+                                else -> onBackground // 未开始 - 使用主题文字色
                             }
                             
                             // 状态框背景色
                             val statusBoxColor = when {
                                 statusInfo?.first == true && statusInfo.second -> successColor // 已完成 - 绿色背景
                                 statusInfo?.first == true && !statusInfo.second -> primaryColor // 进行中 - 主色调背景
-                                else -> backgroundLight // 未开始 - 浅灰背景
+                                else -> surfaceVariant // 未开始 - 使用主题表面变体色
                             }
                             
                             // 状态文字色
                             val statusTextColor = when {
                                 statusInfo?.first == true -> Color.White // 已完成和进行中 - 白色文字
-                                else -> OnBackground // 未开始 - 默认文字色
+                                else -> onBackground // 未开始 - 使用主题文字色
                             }
                             
                             // 段落容器，使用双Box方案实现带圆角的边框
@@ -448,19 +481,19 @@ fun ContentCard(
 
                                             // 段落标题
                                             Text(
-                                                text = "段落${paragraph.paragraph_number}",
-                                                style = Typography.bodyMedium,
-                                                color = OnBackground,
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .padding(start = 12.dp)
-                                            )
+                                                    text = "段落${paragraph.paragraph_number}",
+                                                    style = Typography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.onBackground,
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .padding(start = 12.dp)
+                                                )
 
                                             // 段落时长
                                             Text(
                                                 text = "${paragraph.estimated_duration / 60}分钟",
                                                 style = Typography.bodySmall,
-                                                color = OnBackground,
+                                                color = MaterialTheme.colorScheme.onBackground,
                                                 modifier = Modifier.padding(horizontal = 12.dp)
                                             )
 
@@ -503,7 +536,7 @@ fun ContentCard(
                         Text(
                             text = "暂无段落数据",
                             style = Typography.bodySmall,
-                            color = OnBackground,
+                            color = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier.padding(16.dp)
                         )
                     }

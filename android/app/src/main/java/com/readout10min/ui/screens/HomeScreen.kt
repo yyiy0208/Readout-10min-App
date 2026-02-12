@@ -320,7 +320,7 @@ fun HomeScreen(navController: NavController) {
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 Text(
-                                    text = "⏱️ ${content.estimated_duration} 分钟",
+                                    text = "⏱️ ${content.estimated_duration / 60} 分钟",
                                     style = Typography.bodySmall,
                                     color = OnBackground
                                 )
@@ -432,7 +432,7 @@ fun HomeScreen(navController: NavController) {
                                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                                             ) {
                                                 Text(
-                                                    text = "${content.estimated_duration} 分钟",
+                                                    text = "${content.estimated_duration / 60} 分钟",
                                                     style = Typography.bodySmall,
                                                     color = OnBackground
                                                 )

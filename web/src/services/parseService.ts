@@ -44,15 +44,21 @@ class ParseService {
   // 解析PDF文件
   private async parsePDF(arrayBuffer: ArrayBuffer): Promise<string> {
     try {
-      // 直接使用pdfjs-dist库进行PDF解析，绕过pdf-parse库
-      // 这样可以更精确地控制workerSrc的设置
-      
       // 动态导入pdfjs-dist库
       const pdfjsLib = await import('pdfjs-dist');
       
-      // 使用项目本地的worker文件路径，避免CDN 404错误
-      // 让Vite处理worker文件的路径
-      pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).href;
+      // 确保pdfjsLib对象正确加载
+      if (!pdfjsLib || !pdfjsLib.getDocument) {
+        throw new Error('PDF解析库加载失败');
+      }
+      
+      // 使用项目本地的worker文件路径
+      try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).href;
+      } catch (workerError) {
+        console.warn('Worker路径设置失败，使用默认设置:', workerError);
+        // 即使worker路径设置失败，也继续尝试解析
+      }
       
       // 使用pdfjsLib直接解析PDF
       const loadingTask = pdfjsLib.getDocument({
@@ -78,17 +84,21 @@ class ParseService {
         const textContent = await page.getTextContent();
         
         // 提取文本内容
-        const pageText = textContent.items.map((item: any) => item.str).join(' ');
-        
-        // 添加到完整文本中
-        fullText += pageText + '\n\n';
+        if (textContent && textContent.items) {
+          const pageText = textContent.items.map((item: any) => item.str || '').join(' ');
+          fullText += pageText + '\n\n';
+        }
         
         // 释放页面资源
-        await page.cleanup();
+        if (page.cleanup) {
+          await page.cleanup();
+        }
       }
       
       // 关闭PDF文档
-      await pdfDocument.destroy();
+      if (pdfDocument.destroy) {
+        await pdfDocument.destroy();
+      }
       
       // 验证解析结果
       if (!fullText || fullText.trim().length === 0) {
@@ -210,18 +220,90 @@ class ParseService {
       });
     } else {
       // 需要合并段落
-      const paragraphsPerGroup = Math.ceil(originalParagraphs.length / requiredParagraphs);
+      // 更智能的合并算法：基于目标时长动态调整合并策略
+      let currentGroup: string[] = [];
+      let currentWordCount = 0;
+      let currentEstimatedDuration = 0;
       
-      for (let i = 0; i < originalParagraphs.length; i += paragraphsPerGroup) {
-        const group = originalParagraphs.slice(i, i + paragraphsPerGroup);
-        const combinedText = group.join('\n\n');
-        const wordCount = this.countWords(combinedText);
+      for (const para of originalParagraphs) {
+        const paraWordCount = this.countWords(para);
+        const paraDuration = this.estimateDuration(paraWordCount, para);
         
+        // 检查如果添加当前段落是否会超过目标时长
+        const newDuration = currentEstimatedDuration + paraDuration;
+        
+        if (newDuration <= targetDuration * 1.2) { // 允许120%的误差
+          // 如果不会超过太多，添加到当前组
+          currentGroup.push(para);
+          currentWordCount += paraWordCount;
+          currentEstimatedDuration = newDuration;
+        } else {
+          // 如果会超过，先保存当前组
+          if (currentGroup.length > 0) {
+            const combinedText = currentGroup.join('\n\n');
+            result.push({
+              text: combinedText,
+              wordCount: currentWordCount,
+              estimatedDuration: currentEstimatedDuration
+            });
+          }
+          
+          // 开始新组
+          currentGroup = [para];
+          currentWordCount = paraWordCount;
+          currentEstimatedDuration = paraDuration;
+        }
+      }
+      
+      // 处理最后一组
+      if (currentGroup.length > 0) {
+        const combinedText = currentGroup.join('\n\n');
         result.push({
           text: combinedText,
-          wordCount,
-          estimatedDuration: this.estimateDuration(wordCount, combinedText)
+          wordCount: currentWordCount,
+          estimatedDuration: currentEstimatedDuration
         });
+      }
+      
+      // 确保结果数量合理
+      if (result.length > requiredParagraphs * 2) {
+        // 如果段落数量太多，重新合并
+        let mergedResult: Array<{text: string, wordCount: number, estimatedDuration: number}> = [];
+        let tempGroup: Array<{text: string, wordCount: number, estimatedDuration: number}> = [];
+        let tempDuration = 0;
+        
+        for (const item of result) {
+          if (tempDuration + item.estimatedDuration <= targetDuration * 1.5) {
+            tempGroup.push(item);
+            tempDuration += item.estimatedDuration;
+          } else {
+            if (tempGroup.length > 0) {
+              const combinedText = tempGroup.map(i => i.text).join('\n\n');
+              const combinedWordCount = tempGroup.reduce((sum, i) => sum + i.wordCount, 0);
+              mergedResult.push({
+                text: combinedText,
+                wordCount: combinedWordCount,
+                estimatedDuration: tempDuration
+              });
+              tempGroup = [item];
+              tempDuration = item.estimatedDuration;
+            } else {
+              mergedResult.push(item);
+            }
+          }
+        }
+        
+        if (tempGroup.length > 0) {
+          const combinedText = tempGroup.map(i => i.text).join('\n\n');
+          const combinedWordCount = tempGroup.reduce((sum, i) => sum + i.wordCount, 0);
+          mergedResult.push({
+            text: combinedText,
+            wordCount: combinedWordCount,
+            estimatedDuration: tempDuration
+          });
+        }
+        
+        result = mergedResult;
       }
     }
     
