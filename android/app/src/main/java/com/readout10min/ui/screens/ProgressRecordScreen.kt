@@ -45,11 +45,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import com.readout10min.data.models.Progress
 import com.readout10min.data.repositories.ContentRepository
 import com.readout10min.navigation.Screen
-import com.readout10min.ui.theme.OnBackground
 import com.readout10min.ui.theme.Purple80
-import com.readout10min.ui.theme.SurfaceContainer
-import com.readout10min.ui.theme.SurfaceVariant
 import com.readout10min.ui.theme.Typography
+import androidx.compose.material3.MaterialTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.min
@@ -61,6 +59,12 @@ import java.util.UUID
 fun ProgressRecordScreen(navController: NavController) {
     val context = LocalContext.current
     val contentRepository = ContentRepository()
+    
+    // 获取主题颜色
+    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+    val onBackground = MaterialTheme.colorScheme.onBackground
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
     
     // 状态管理
     val currentMonth = remember { 
@@ -377,7 +381,7 @@ fun ProgressRecordScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .drawBehind {
-                    drawRect(color = SurfaceContainer)
+                    drawRect(color = surfaceContainer)
                 }
                 .padding(12.dp)
         ) {
@@ -389,7 +393,7 @@ fun ProgressRecordScreen(navController: NavController) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "返回首页",
-                    tint = OnBackground
+                    tint = onBackground
                 )
             }
         }
@@ -421,7 +425,7 @@ fun ProgressRecordScreen(navController: NavController) {
                     Text(
                         text = error ?: "加载失败",
                         style = Typography.bodyMedium,
-                        color = OnBackground,
+                        color = onBackground,
                         modifier = Modifier.padding(16.dp)
                     )
                     Button(
@@ -443,7 +447,7 @@ fun ProgressRecordScreen(navController: NavController) {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(8.dp))
                         .drawBehind {
-                            drawRect(color = SurfaceContainer)
+                            drawRect(color = surfaceContainer)
                         }
                         .padding(16.dp)
                 ) {
@@ -455,7 +459,7 @@ fun ProgressRecordScreen(navController: NavController) {
                         Text(
                             text = "练习统计",
                             style = Typography.titleMedium,
-                            color = OnBackground
+                            color = onBackground
                         )
                         
                         // 累积练习天数
@@ -467,7 +471,7 @@ fun ProgressRecordScreen(navController: NavController) {
                             Text(
                                 text = "累积练习天数",
                                 style = Typography.bodyMedium,
-                                color = OnBackground
+                                color = onBackground
                             )
                             Text(
                                 text = "${practiceDates.size}天",
@@ -487,7 +491,7 @@ fun ProgressRecordScreen(navController: NavController) {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(8.dp))
                         .drawBehind {
-                            drawRect(color = SurfaceContainer)
+                            drawRect(color = surfaceContainer)
                         }
                         .padding(16.dp)
                 ) {
@@ -499,7 +503,7 @@ fun ProgressRecordScreen(navController: NavController) {
                         Text(
                             text = "练习日历",
                             style = Typography.titleMedium,
-                            color = OnBackground
+                            color = onBackground
                         )
                         
                         // 日历头部
@@ -511,7 +515,7 @@ fun ProgressRecordScreen(navController: NavController) {
                             Text(
                                 text = currentMonth.value,
                                 style = Typography.bodyMedium,
-                                color = OnBackground,
+                                color = onBackground,
                                 fontWeight = FontWeight.Medium
                             )
                             Row(
@@ -548,7 +552,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                             }
                                         }
                                         .drawBehind {
-                                            drawRect(color = Color(231, 224, 235))
+                                            drawRect(color = surfaceVariant)
                                         }
                                         .align(Alignment.CenterVertically)
                                 ) {
@@ -556,7 +560,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                         text = "‹",
                                         style = TextStyle(
                                             fontSize = 18.sp,
-                                            color = OnBackground
+                                            color = onBackground
                                         ),
                                         modifier = Modifier.align(Alignment.Center)
                                     )
@@ -592,7 +596,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                             }
                                         }
                                         .drawBehind {
-                                            drawRect(color = Color(231, 224, 235))
+                                            drawRect(color = surfaceVariant)
                                         }
                                         .align(Alignment.CenterVertically)
                                 ) {
@@ -600,7 +604,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                         text = "›",
                                         style = TextStyle(
                                             fontSize = 18.sp,
-                                            color = OnBackground
+                                            color = onBackground
                                         ),
                                         modifier = Modifier.align(Alignment.Center)
                                     )
@@ -712,7 +716,7 @@ fun ProgressRecordScreen(navController: NavController) {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(8.dp))
                         .drawBehind {
-                            drawRect(color = SurfaceContainer)
+                            drawRect(color = surfaceContainer)
                         }
                         .padding(16.dp)
                 ) {
@@ -728,7 +732,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                 "点击日历日期查看练习段落"
                             },
                             style = Typography.titleMedium,
-                            color = OnBackground
+                            color = onBackground
                         )
                         
                         // 当日练习段落列表
@@ -754,7 +758,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                             .fillMaxWidth()
                                             .clip(RoundedCornerShape(8.dp))
                                             .drawBehind {
-                                                drawRect(color = Color(231, 224, 235))
+                                                drawRect(color = surfaceVariant)
                                             }
                                             .padding(12.dp)
                                     ) {
@@ -768,7 +772,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                                     style = TextStyle(
                                                         fontSize = 14.sp,
                                                         fontWeight = FontWeight.Medium,
-                                                        color = OnBackground
+                                                        color = onBackground
                                                     )
                                                 )
                                                 
@@ -777,7 +781,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                                     text = "文章: ${getContentTitle(record.content_id)}",
                                                     style = TextStyle(
                                                         fontSize = 12.sp,
-                                                        color = Color(73, 69, 78)
+                                                        color = onSurfaceVariant
                                                     )
                                                 )
                                                 
@@ -786,7 +790,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                                     text = "练习时间: ${formatDateTime(record.practice_date)}",
                                                     style = TextStyle(
                                                         fontSize = 12.sp,
-                                                        color = Color(73, 69, 78)
+                                                        color = onSurfaceVariant
                                                     )
                                                 )
                                                 
@@ -795,7 +799,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                                     text = "练习时长: ${record.duration / 60}分钟",
                                                     style = TextStyle(
                                                         fontSize = 12.sp,
-                                                        color = Color(73, 69, 78)
+                                                        color = onSurfaceVariant
                                                     )
                                                 )
                                         }
@@ -813,7 +817,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                 Text(
                                     text = "当日无练习记录",
                                     style = Typography.bodyMedium,
-                                    color = Color(73, 69, 78)
+                                    color = onSurfaceVariant
                                 )
                             }
                         } else {
@@ -827,7 +831,7 @@ fun ProgressRecordScreen(navController: NavController) {
                                 Text(
                                     text = "请点击日历上的日期查看当日练习段落",
                                     style = Typography.bodyMedium,
-                                    color = Color(73, 69, 78),
+                                    color = onSurfaceVariant,
                                     modifier = Modifier.fillMaxWidth(),
                                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )
@@ -869,7 +873,7 @@ fun CalendarDay(
                 color = when {
                     isOtherMonth -> Color(203, 196, 207)
                     isToday || hasPractice -> Color.White
-                    else -> OnBackground
+                    else -> MaterialTheme.colorScheme.onBackground
                 },
                 fontWeight = when {
                     isToday -> FontWeight.SemiBold

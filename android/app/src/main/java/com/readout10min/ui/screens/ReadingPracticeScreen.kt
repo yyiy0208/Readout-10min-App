@@ -65,13 +65,14 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
     val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
     val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
     val onBackground = MaterialTheme.colorScheme.onBackground
+    val background = MaterialTheme.colorScheme.background
     
     // 状态管理
     val activePanel = remember { mutableStateOf<String?>(null) }
     val isControlsVisible = remember { mutableStateOf(true) }
     val fontSize = remember { mutableStateOf<Float>(16f) }
     val lineHeight = remember { mutableStateOf<Float>(24f) }
-    val backgroundColor = remember { mutableStateOf(Color.White) }
+    val backgroundColor = remember { mutableStateOf(background) }
     val progress = remember { mutableStateOf(0.0f) } // 0.0 to 1.0
     
     var paragraphs by remember { mutableStateOf<List<DataParagraph>>(emptyList()) }

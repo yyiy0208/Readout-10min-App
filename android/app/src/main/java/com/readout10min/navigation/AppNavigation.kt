@@ -34,6 +34,11 @@ import com.readout10min.ui.theme.Purple80
 import com.readout10min.ui.theme.SurfaceVariant
 import com.readout10min.ui.theme.OnSurfaceVariant
 import com.readout10min.ui.theme.OnSurface
+import com.readout10min.ui.theme.SurfaceVariantDark
+import com.readout10min.ui.theme.OnSurfaceVariantDark
+import com.readout10min.ui.theme.SurfaceContainerDark
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.UUID
@@ -69,6 +74,11 @@ fun AppNavigation() {
     val lastPracticeContent = remember { mutableStateOf<UUID?>(null) }
     val lastPracticeParagraph = remember { mutableStateOf<Int?>(null) }
     
+    // 获取主题状态
+    val isDarkTheme = isSystemInDarkTheme()
+    val surfaceVariant = if (isDarkTheme) SurfaceContainerDark else SurfaceVariant
+    val onSurfaceVariant = if (isDarkTheme) OnSurfaceVariantDark else OnSurfaceVariant
+    
     // 加载上一次练习的内容
     LaunchedEffect(key1 = Unit) {
         try {
@@ -97,7 +107,7 @@ fun AppNavigation() {
         bottomBar = {
             if (isNavBarVisible.value) {
                 BottomAppBar(
-                    containerColor = SurfaceVariant,
+                    containerColor = surfaceVariant,
                 ) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
@@ -167,9 +177,9 @@ fun AppNavigation() {
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = Purple80,
                                 selectedTextColor = Purple80,
-                                unselectedIconColor = OnSurfaceVariant,
-                                unselectedTextColor = OnSurfaceVariant,
-                                indicatorColor = SurfaceVariant
+                                unselectedIconColor = onSurfaceVariant,
+                                unselectedTextColor = onSurfaceVariant,
+                                indicatorColor = surfaceVariant
                             )
                         )
                     }

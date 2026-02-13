@@ -36,14 +36,11 @@ import androidx.navigation.NavController
 import com.readout10min.data.models.Content
 import com.readout10min.data.repositories.ContentRepository
 import com.readout10min.navigation.Screen
-import com.readout10min.ui.theme.BackgroundColor
-import com.readout10min.ui.theme.OnBackground
 import com.readout10min.ui.theme.Purple80
-import com.readout10min.ui.theme.SurfaceColor
-import com.readout10min.ui.theme.SurfaceContainer
-import com.readout10min.ui.theme.SurfaceVariant
 import com.readout10min.ui.theme.Typography
 import com.readout10min.ui.theme.White
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.isSystemInDarkTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -52,6 +49,16 @@ import java.util.*
 fun HomeScreen(navController: NavController) {
     val context = LocalContext.current
     val contentRepository = ContentRepository()
+    
+    // 获取主题颜色
+    val isDarkTheme = isSystemInDarkTheme()
+    val surfaceContainer = if (isDarkTheme) {
+        Color(41, 38, 45) // 使用深色的SurfaceContainerDark
+    } else {
+        MaterialTheme.colorScheme.surfaceContainer
+    }
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+    val onBackground = MaterialTheme.colorScheme.onBackground
     
     var recommendedContent by remember { mutableStateOf<List<Content>>(emptyList()) }
     var recentContent by remember { mutableStateOf<List<Content>>(emptyList()) }
@@ -189,7 +196,7 @@ fun HomeScreen(navController: NavController) {
                     Text(
                         text = "练习统计",
                         style = Typography.titleMedium,
-                        color = OnBackground
+                        color = onBackground
                     )
                     Text(
                         text = "更多",
@@ -206,7 +213,7 @@ fun HomeScreen(navController: NavController) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = SurfaceContainer
+                        containerColor = surfaceContainer
                     ),
                     elevation = CardDefaults.cardElevation(
                         defaultElevation = 2.dp
@@ -231,7 +238,7 @@ fun HomeScreen(navController: NavController) {
                                 Text(
                                     text = "累计练习天数",
                                     style = Typography.bodySmall,
-                                    color = OnBackground
+                                    color = onBackground
                                 )
                             }
                             Box(
@@ -239,7 +246,7 @@ fun HomeScreen(navController: NavController) {
                                     .width(1.dp)
                                     .height(40.dp)
                                     .drawBehind {
-                                        drawRect(color = SurfaceVariant)
+                                        drawRect(color = surfaceVariant)
                                     }
                             )
                             Column(
@@ -253,7 +260,7 @@ fun HomeScreen(navController: NavController) {
                                 Text(
                                     text = "今日练习",
                                     style = Typography.bodySmall,
-                                    color = OnBackground
+                                    color = onBackground
                                 )
                             }
                         }
@@ -272,7 +279,7 @@ fun HomeScreen(navController: NavController) {
                     Text(
                         text = "今日推荐",
                         style = Typography.titleMedium,
-                        color = OnBackground
+                        color = onBackground
                     )
                     Text(
                         text = "查看全部",
@@ -301,7 +308,7 @@ fun HomeScreen(navController: NavController) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = SurfaceContainer
+                            containerColor = surfaceContainer
                         ),
                         elevation = CardDefaults.cardElevation(
                             defaultElevation = 2.dp
@@ -314,7 +321,7 @@ fun HomeScreen(navController: NavController) {
                             Text(
                                 text = content.title,
                                 style = Typography.titleMedium,
-                                color = OnBackground
+                                color = onBackground
                             )
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -322,13 +329,13 @@ fun HomeScreen(navController: NavController) {
                                 Text(
                                     text = "⏱️ ${content.estimated_duration / 60} 分钟",
                                     style = Typography.bodySmall,
-                                    color = OnBackground
+                                    color = onBackground
                                 )
                             }
                             Text(
                                 text = "This article is recommended for you based on your reading history and preferences...",
                                 style = Typography.bodyMedium,
-                                color = OnBackground
+                                color = onBackground
                             )
                             Button(
                                 onClick = { 
@@ -355,7 +362,7 @@ fun HomeScreen(navController: NavController) {
                         Text(
                             text = "暂无推荐内容",
                             style = Typography.bodyMedium,
-                            color = OnBackground
+                            color = onBackground
                         )
                     }
                 }
@@ -372,7 +379,7 @@ fun HomeScreen(navController: NavController) {
                     Text(
                         text = "最近阅读",
                         style = Typography.titleMedium,
-                        color = OnBackground
+                        color = onBackground
                     )
                     Text(
                         text = "查看全部",
@@ -409,7 +416,7 @@ fun HomeScreen(navController: NavController) {
                                             navController.navigate("${Screen.ReadingPractice.route}/${content.id}") 
                                         },
                                     colors = CardDefaults.cardColors(
-                                        containerColor = SurfaceContainer
+                                        containerColor = surfaceContainer
                                     ),
                                     elevation = CardDefaults.cardElevation(
                                         defaultElevation = 2.dp
@@ -426,7 +433,7 @@ fun HomeScreen(navController: NavController) {
                                             Text(
                                                 text = content.title,
                                                 style = Typography.bodyMedium,
-                                                color = OnBackground
+                                                color = onBackground
                                             )
                                             Column(
                                                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -434,7 +441,7 @@ fun HomeScreen(navController: NavController) {
                                                 Text(
                                                     text = "${content.estimated_duration / 60} 分钟",
                                                     style = Typography.bodySmall,
-                                                    color = OnBackground
+                                                    color = onBackground
                                                 )
                                                 Text(
                                                     text = "70%", // 模拟进度
@@ -459,7 +466,7 @@ fun HomeScreen(navController: NavController) {
                         Text(
                             text = "暂无最近阅读",
                             style = Typography.bodyMedium,
-                            color = OnBackground
+                            color = onBackground
                         )
                     }
                 }
@@ -471,7 +478,7 @@ fun HomeScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .drawBehind {
-                    drawRect(color = SurfaceContainer)
+                    drawRect(color = if (isDarkTheme) Color(41, 38, 45) else surfaceContainer)
                 }
                 .padding(8.dp)
         ) {
@@ -514,10 +521,10 @@ fun HomeScreen(navController: NavController) {
                         )
                     )
                     Text(
-                        text = "内容库",
-                        style = Typography.bodySmall,
-                        color = OnBackground
-                    )
+                            text = "内容库",
+                            style = Typography.bodySmall,
+                            color = onBackground
+                        )
                 }
                 
                 // 练习
@@ -534,10 +541,10 @@ fun HomeScreen(navController: NavController) {
                         )
                     )
                     Text(
-                        text = "练习",
-                        style = Typography.bodySmall,
-                        color = OnBackground
-                    )
+                            text = "练习",
+                            style = Typography.bodySmall,
+                            color = onBackground
+                        )
                 }
                 
                 // 记录
@@ -554,10 +561,10 @@ fun HomeScreen(navController: NavController) {
                         )
                     )
                     Text(
-                        text = "记录",
-                        style = Typography.bodySmall,
-                        color = OnBackground
-                    )
+                            text = "记录",
+                            style = Typography.bodySmall,
+                            color = onBackground
+                        )
                 }
             }
         }

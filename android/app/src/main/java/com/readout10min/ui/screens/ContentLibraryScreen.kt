@@ -68,6 +68,10 @@ fun ContentLibraryScreen(navController: NavController) {
     val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
     val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
     val onBackground = MaterialTheme.colorScheme.onBackground
+    val tertiary = MaterialTheme.colorScheme.tertiary
+    val secondary = MaterialTheme.colorScheme.secondary
+    val onTertiary = MaterialTheme.colorScheme.onTertiary
+    val outline = MaterialTheme.colorScheme.outline
     
     var contentList by remember { mutableStateOf<List<Content>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -196,6 +200,12 @@ fun ContentCard(
     val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
     val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
     val onBackground = MaterialTheme.colorScheme.onBackground
+    val tertiaryContainer = MaterialTheme.colorScheme.tertiaryContainer
+    val secondaryContainer = MaterialTheme.colorScheme.secondaryContainer
+    val tertiary = MaterialTheme.colorScheme.tertiary
+    val secondary = MaterialTheme.colorScheme.secondary
+    val onTertiary = MaterialTheme.colorScheme.onTertiary
+    val outline = MaterialTheme.colorScheme.outline
     
     var paragraphs by remember { mutableStateOf<List<Paragraph>>(emptyList()) }
     var isLoadingParagraphs by remember { mutableStateOf(false) }
@@ -390,41 +400,41 @@ fun ContentCard(
                             
                             // 卡片背景色
                             val cardColor = when {
-                                statusInfo?.first == true && statusInfo.second -> Color(240, 253, 244) // 已完成 - 浅绿背景
-                                statusInfo?.first == true && !statusInfo.second -> Color(255, 248, 250) // 进行中 - 浅粉背景
+                                statusInfo?.first == true && statusInfo.second -> tertiaryContainer // 已完成 - 使用主题 tertiaryContainer
+                                statusInfo?.first == true && !statusInfo.second -> secondaryContainer // 进行中 - 使用主题 secondaryContainer
                                 else -> surfaceContainer // 未开始 - 使用主题背景
                             }
                             
                             // 边框颜色
                             val borderColorValue = when {
-                                statusInfo?.first == true && statusInfo.second -> successColor // 已完成 - 绿色边框
-                                statusInfo?.first == true && !statusInfo.second -> primaryColor // 进行中 - 主色调边框
-                                else -> MaterialTheme.colorScheme.outline // 未开始 - 使用主题边框色
+                                statusInfo?.first == true && statusInfo.second -> tertiary // 已完成 - 使用主题 tertiary
+                                statusInfo?.first == true && !statusInfo.second -> secondary // 进行中 - 使用主题 secondary
+                                else -> outline // 未开始 - 使用主题边框色
                             }
                             
                             // 段落编号背景色
                             val numberBackgroundColor = when {
-                                statusInfo?.first == true && statusInfo.second -> successColor // 已完成 - 绿色背景
-                                statusInfo?.first == true && !statusInfo.second -> primaryColor // 进行中 - 主色调背景
+                                statusInfo?.first == true && statusInfo.second -> tertiary // 已完成 - 使用主题 tertiary
+                                statusInfo?.first == true && !statusInfo.second -> secondary // 进行中 - 使用主题 secondary
                                 else -> surfaceVariant // 未开始 - 使用主题表面变体色
                             }
                             
                             // 段落编号文字色
                             val numberTextColor = when {
-                                statusInfo?.first == true -> Color.White // 已完成和进行中 - 白色文字
+                                statusInfo?.first == true -> onTertiary // 已完成和进行中 - 使用主题 onTertiary
                                 else -> onBackground // 未开始 - 使用主题文字色
                             }
                             
                             // 状态框背景色
                             val statusBoxColor = when {
-                                statusInfo?.first == true && statusInfo.second -> successColor // 已完成 - 绿色背景
-                                statusInfo?.first == true && !statusInfo.second -> primaryColor // 进行中 - 主色调背景
+                                statusInfo?.first == true && statusInfo.second -> tertiary // 已完成 - 使用主题 tertiary
+                                statusInfo?.first == true && !statusInfo.second -> secondary // 进行中 - 使用主题 secondary
                                 else -> surfaceVariant // 未开始 - 使用主题表面变体色
                             }
                             
                             // 状态文字色
                             val statusTextColor = when {
-                                statusInfo?.first == true -> Color.White // 已完成和进行中 - 白色文字
+                                statusInfo?.first == true -> onTertiary // 已完成和进行中 - 使用主题 onTertiary
                                 else -> onBackground // 未开始 - 使用主题文字色
                             }
                             
