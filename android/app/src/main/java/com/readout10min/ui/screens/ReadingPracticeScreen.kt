@@ -75,6 +75,17 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
     val backgroundColor = remember { mutableStateOf(background) }
     val progress = remember { mutableStateOf(0.0f) } // 0.0 to 1.0
     
+    // 监听生命周期，确保页面销毁时重置导航栏可见性
+    androidx.compose.runtime.DisposableEffect(key1 = Unit) {
+        // 当页面进入组合时，确保导航栏可见
+        isNavBarVisible.value = true
+        
+        // 当页面退出组合时，重置导航栏可见性
+        onDispose {
+            isNavBarVisible.value = true
+        }
+    }
+    
     var paragraphs by remember { mutableStateOf<List<DataParagraph>>(emptyList()) }
     var currentParagraph by remember { mutableStateOf<DataParagraph?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -204,7 +215,11 @@ fun ReadingPracticeScreen(navController: NavController, contentId: UUID?, paragr
             ) {
                 // 返回按钮
                 IconButton(
-                    onClick = { navController.navigateUp() },
+                    onClick = {
+                        // 重置导航栏可见性
+                        isNavBarVisible.value = true
+                        navController.navigateUp()
+                    },
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
                     Icon(
